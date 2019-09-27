@@ -12,7 +12,9 @@ This role uses JP Mens' pdns_zone module for Ansible, you can find it, and it's
 documentation [on his Github](https://github.com/jpmens/ansible-m-pdns_zone)
 
 You need to install this module in your Ansible project by placing it in
-``` ansible_root/modules/pdns_zone.py ```
+```
+ansible_root/modules/pdns_zone.py
+```
 
 # Deployment
 After the initial deployment of the server, you'll need to create NS records
