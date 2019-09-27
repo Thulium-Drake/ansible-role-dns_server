@@ -1,0 +1,12 @@
+---
+# Which backend to use to store zone data
+dns_server_backend: 'sqlite3'
+
+# Key used by Ansible to communicate with PowerDNS' API
+dns_server_api_key: 'very_secure_random_password_which_is_also_very_long'
+
+# Name of the zone
+dns_server_zone: 'sub.example.com'
+
+# Hostname under which the nameserver is reachable
+dns_server_ns_name: 'ns-sub.example.com'

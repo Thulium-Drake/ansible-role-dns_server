@@ -1,0 +1,41 @@
+# Ansible role to configure an authoratative nameserver for a local domain
+This role will provide a means to install, configure and update a local DNS
+server with information for systems in the network.
+
+This role uses PowerDNS as the server.
+
+The only supported OS for this role (for now) is Debian, as I did not have
+an environment with CentOS/RHEL on hand when developing this.
+
+# Setup
+This role uses JP Mens' pdns_zone module for Ansible, you can find it, and it's
+documentation [https://github.com/jpmens/ansible-m-pdns_zone](on his Github)
+
+# Deployment
+After the initial deployment of the server, you'll need to create NS records
+for the locally served subdomain pointing to this server.
+
+Then make sure the intented clients are able to connect to this server.
+
+# Registering records
+Manipulating the contents of the created zone can be done using Ansible's
+nsupdate module. The DNS server is configured to automatically accept any
+updates coming from the localhost. You can update the zone with a play like
+this:
+
+```
+- name: 'Update zone'
+  host: 'ns-sub.example.com'
+  tasks:
+    - nsupdate:
+        server: '127.0.0.1'
+        ttl: '60'
+        zone: 'sub.example.com'
+        record: 'host'
+        value: '192.168.1.1'
+        type: 'A'
+      register: 'dns_updated'
+      retries: 3
+      delay: 3
+      until: not dns_updated.failed
+```

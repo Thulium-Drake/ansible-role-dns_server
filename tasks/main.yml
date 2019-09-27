@@ -1,0 +1,28 @@
+---
+- name: 'Install packages'
+  include_tasks: "install-{{ ansible_os_family }}.yml"
+
+- name: 'Enable service'
+  service:
+    name: 'pdns'
+    state: 'started'
+    enabled: true
+
+- name: 'Ensure API settings'
+  template:
+    src: 'ansible_api.conf.j2'
+    dest: '/etc/powerdns/pdns.d/ansible_api.conf'
+  notify: 'restart pdns'
+
+- meta: 'flush_handlers'
+
+- name: 'Ensure zone'
+  pdns_zone:
+    api_host: '127.0.0.1'
+    api_port: 8081
+    api_key: "{{ dns_server_api_key }}"
+    zone: "{{ dns_server_zone }}"
+    action: 'master'
+    ttl: 3600
+    nsset: "{{ dns_server_ns_name }}"
+    soa: "{{dns_server_ns_name }} hostmaster.{{ dns_server_zone}}. 2019092601 600 600 604800 600"

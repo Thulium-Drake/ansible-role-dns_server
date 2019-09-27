@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+# API access for zone manipulation
+api=yes
+api-key={{ dns_server_api_key }}
+webserver=yes
+webserver-port=8081
+webserver-address=127.0.0.1
+
+# DNS update is used to register/update systems
+dnsupdate=yes
+allow-dnsupdate-from=127.0.0.0/8

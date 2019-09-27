@@ -1,0 +1,8 @@
+---
+- name: 'Install PowerDNS'
+  apt:
+    name:
+      - 'pdns-server'
+      - "pdns-backend-{{ dns_server_backend }}"
+    state: 'present'
+    update_cache: true
