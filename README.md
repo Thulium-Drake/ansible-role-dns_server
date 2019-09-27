@@ -9,7 +9,7 @@ an environment with CentOS/RHEL on hand when developing this.
 
 # Setup
 This role uses JP Mens' pdns_zone module for Ansible, you can find it, and it's
-documentation [https://github.com/jpmens/ansible-m-pdns_zone]("on his Github")
+documentation ["on his Github"](https://github.com/jpmens/ansible-m-pdns_zone)
 
 # Deployment
 After the initial deployment of the server, you'll need to create NS records
