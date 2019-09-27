@@ -4,5 +4,6 @@
     name:
       - 'pdns-server'
       - "pdns-backend-{{ dns_server_backend }}"
+      - 'python-dnspython'
     state: 'present'
     update_cache: true
