@@ -25,4 +25,19 @@
     action: 'master'
     ttl: 3600
     nsset: "{{ dns_server_ns_name }}"
-    soa: "{{dns_server_ns_name }} hostmaster.{{ dns_server_zone}}. 2019092601 600 600 604800 600"
+    soa: "{{dns_server_ns_name }} hostmaster.{{ dns_server_zone}}. 1 600 600 604800 600"
+  register: 'zone_created'
+
+- name: 'Ensure NS record'
+  nsupdate:
+    server: '127.0.0.1'
+    ttl: '60'
+    zone: "{{ dns_server_zone }}"
+    record: "{{ dns_server_zone }}."
+    value: "{{ dns_server_ns_name }}."
+    type: 'NS'
+  register: 'dns_updated'
+  retries: 3
+  delay: 3
+  until: not dns_updated.failed
+
