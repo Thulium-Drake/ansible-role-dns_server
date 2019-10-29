@@ -10,3 +10,9 @@ dns_server_zone: 'sub.example.com'
 
 # Hostname under which the nameserver is reachable
 dns_server_ns_name: 'ns-sub.example.com'
+
+# When set to true, create a zone for an AD DC to update
+dns_server_ad_enabled: false
+
+# IP address for the AD DC for use with nsupdate
+dns_server_ad_dc_ip: '192.168.1.2'

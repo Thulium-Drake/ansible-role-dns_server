@@ -2,7 +2,8 @@
 This role will provide a means to install, configure and update a local DNS
 server with information for systems in the network.
 
-This role uses PowerDNS as the server.
+This role uses PowerDNS as the server and can be used for deployment of
+Active Directory.
 
 The only supported OS for this role (for now) is Debian, as I did not have
 an environment with CentOS/RHEL on hand when developing this.

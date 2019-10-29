@@ -24,9 +24,8 @@
     zone: "{{ dns_server_zone }}"
     action: 'master'
     ttl: 3600
-    nsset: "{{ dns_server_ns_name }}"
-    soa: "{{dns_server_ns_name }} hostmaster.{{ dns_server_zone}}. 1 600 600 604800 600"
-  register: 'zone_created'
+    nsset: "{{ dns_server_ns_name }}."
+    soa: "{{dns_server_ns_name }}. hostmaster.{{ dns_server_zone}}. 1 600 600 604800 600"
 
 - name: 'Ensure NS record'
   nsupdate:
@@ -41,3 +40,27 @@
   delay: 3
   until: not dns_updated.failed
 
+- name: 'Create Active Directory zone'
+  block:
+    - pdns_zone:
+        api_host: '127.0.0.1'
+        api_port: 8081
+        api_key: "{{ dns_server_api_key }}"
+        zone: "_msdcs.{{ dns_server_zone }}"
+        action: 'master'
+        ttl: 3600
+        nsset: "{{ dns_server_ns_name }}."
+        soa: "_msdcs.{{dns_server_ns_name }}. hostmaster.{{ dns_server_zone}}. 1 600 600 604800 600"
+    - name: 'Ensure NS record'
+      nsupdate:
+        server: '127.0.0.1'
+        ttl: '60'
+        zone: "{{ dns_server_zone }}"
+        record: "{{ dns_server_zone }}."
+        value: "{{ dns_server_ns_name }}."
+        type: 'NS'
+      register: 'dns_updated'
+      retries: 3
+      delay: 3
+      until: not dns_updated.failed
+  when: dns_server_ad_enabled
