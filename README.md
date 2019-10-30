@@ -1,5 +1,3 @@
-[![Build Status](https://drone.element-networks.nl/api/badges/Element-Networks/ansible-role-dns_server/status.svg)](https://drone.element-networks.nl/Element-Networks/ansible-role-dns_server)
-
 # Ansible role to configure an authoratative nameserver for a local domain
 This role will provide a means to install, configure and update a local DNS
 server with information for systems in the network.
