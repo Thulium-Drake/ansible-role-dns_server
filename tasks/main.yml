@@ -63,4 +63,4 @@
       retries: 3
       delay: 3
       until: not dns_updated.failed
-  when: dns_server_ad_enabled
+  when: dns_server_ad_enabled | bool
