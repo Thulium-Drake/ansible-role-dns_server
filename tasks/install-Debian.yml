@@ -5,6 +5,6 @@
       - 'pdns-server'
       - "pdns-backend-{{ dns_server_backend }}"
       - 'python-dnspython'
-      - 'dnsutils
+      - 'dnsutils'
     state: 'present'
     update_cache: true
