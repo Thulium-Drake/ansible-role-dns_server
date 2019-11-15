@@ -12,7 +12,7 @@ local-port={{ dns_server_port }}
 
 # DNS update is used to register/update systems
 dnsupdate=yes
-allow-dnsupdate-from=127.0.0.0/8,{{ dns_server_address }}{% if dns_server_ad_enabled %}, {{ dns_server_ad_dc_ip }} {% endif %}
+allow-dnsupdate-from=127.0.0.0/8{% if dns_server_ad_enabled %}, {{ dns_server_ad_dc_ip }} {% endif %}
 
 # Default name for SOA
 default-soa-name={{ dns_server_ns_name }}
