@@ -4,16 +4,17 @@
 
 - name: 'Ensure API settings'
   template:
-    src: "{{ template.src }}"
-    dest: "{{ template.dest }}"
+    src: 'ansible_api.conf.j2'
+    dest: '/etc/powerdns/pdns.d/ansible_api.conf'
   notify:
     - 'restart pdns'
+
+- name: 'Ensure recursor settings'
+  template:
+    src: 'recursor.conf.j2'
+    dest: '/etc/powerdns/recursor.conf'
+  notify:
     - 'restart pdns-recursor'
-  loop:
-    - { src: 'ansible_api.conf.j2', dest: '/etc/powerdns/pdns.d/ansible_api.conf' }
-    - { src: 'recursor.conf.j2', dest: '/etc/powerdns/recursor.conf' }
-  loop_control:
-    loop_var: 'template'
 
 - name: 'Enable services'
   service:
