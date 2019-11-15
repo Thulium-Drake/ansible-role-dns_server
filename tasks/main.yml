@@ -2,12 +2,6 @@
 - name: 'Install packages'
   include_tasks: "install-{{ ansible_os_family }}.yml"
 
-- name: 'Enable service'
-  service:
-    name: 'pdns'
-    state: 'started'
-    enabled: true
-
 - name: 'Ensure API settings'
   template:
     src: "{{ template.src }}"
@@ -18,6 +12,17 @@
     - { src: 'recursor.conf.j2', dest: '/etc/powerdns/recursor.conf' }
   loop_control:
     loop_var: 'template'
+
+- name: 'Enable services'
+  service:
+    name: "{{ service }}"
+    state: 'started'
+    enabled: true
+  loop:
+    - 'pdns'
+    - 'pdns-recursor'
+  loop_control:
+    loop_var: 'service'
 
 - meta: 'flush_handlers'
 
