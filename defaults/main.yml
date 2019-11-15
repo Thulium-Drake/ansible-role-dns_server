@@ -8,6 +8,13 @@ dns_server_api_key: 'very_secure_random_password_which_is_also_very_long'
 # Name of the zone
 dns_server_zone: 'sub.example.com'
 
+# Port and listen address for the Authoritative server
+dns_server_address: '127.0.0.1'
+dns_server_port: 5300
+
+# Listen address for the Recursor
+dns_recursor_address: '0.0.0.0'
+
 # Hostname under which the nameserver is reachable
 dns_server_ns_name: 'ns-sub.example.com'
 

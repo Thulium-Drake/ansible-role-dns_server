@@ -2,10 +2,12 @@
 This role will provide a means to install, configure and update a local DNS
 server with information for systems in the network.
 
-It will also configure a recursor on the same machine. It will be setup as follows:
+It will also configure a recursor on the same machine. By default, this looks like:
 
-* PDNS-recursor : port 53
-* PDNS-server   : port 5300
+* PDNS-recursor : port 53 on 0.0.0.0
+* PDNS-server   : port 5300 on 127.0.0.1
+
+Check the defaults if you want to make changes.
 
 This role uses PowerDNS as the server and can be used for deployment of
 Active Directory.

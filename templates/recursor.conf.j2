@@ -1,8 +1,8 @@
 # {{ ansible_managed }}
 config-dir=/etc/powerdns
 hint-file=/usr/share/dns/root.hints
-local-address=0.0.0.0
-forward-zones={{ dns_server_zone }}=127.0.0.1:5300
+local-address={{ dns_recursor_address }}
+forward-zones={{ dns_server_zone }}={{ dns_server_address}}:{{ dns_server_port }}
 quiet=yes
 security-poll-suffix=
 setgid=pdns
