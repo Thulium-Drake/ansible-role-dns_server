@@ -42,8 +42,8 @@
 
 - name: 'Ensure NS record'
   nsupdate:
-    server: '127.0.0.1'
-    port: 5300
+    server: "{{ dns_server_address }}"
+    port: "{{ dns_server_port }}"
     ttl: '60'
     zone: "{{ dns_server_zone }}"
     record: "{{ dns_server_zone }}."
