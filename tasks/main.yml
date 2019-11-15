@@ -10,9 +10,14 @@
 
 - name: 'Ensure API settings'
   template:
-    src: 'ansible_api.conf.j2'
-    dest: '/etc/powerdns/pdns.d/ansible_api.conf'
+    src: "{{ template.src }}"
+    dest: "{{ template.dest }}"
   notify: 'restart pdns'
+  loop:
+    - { src: 'ansible_api.conf.j2', dest: '/etc/powerdns/pdns.d/ansible_api.conf' }
+    - { src: 'recursor.conf.j2', dest: '/etc/powerdns/recursor.conf' }
+  loop_control:
+    loop_var: 'template'
 
 - meta: 'flush_handlers'
 
@@ -30,6 +35,7 @@
 - name: 'Ensure NS record'
   nsupdate:
     server: '127.0.0.1'
+    port: 5300
     ttl: '60'
     zone: "{{ dns_server_zone }}"
     record: "{{ dns_server_zone }}."
@@ -54,6 +60,7 @@
     - name: 'Ensure NS record'
       nsupdate:
         server: '127.0.0.1'
+        port: 5300
         ttl: '60'
         zone: "{{ dns_server_zone }}"
         record: "{{ dns_server_zone }}."

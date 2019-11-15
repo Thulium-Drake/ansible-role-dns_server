@@ -3,6 +3,7 @@
   apt:
     name:
       - 'pdns-server'
+      - 'pdns-recursor'
       - "pdns-backend-{{ dns_server_backend }}"
       - 'python-dnspython'
       - 'dnsutils'

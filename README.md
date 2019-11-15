@@ -2,6 +2,11 @@
 This role will provide a means to install, configure and update a local DNS
 server with information for systems in the network.
 
+It will also configure a recursor on the same machine. It will be setup as follows:
+
+* PDNS-recursor : port 53
+* PDNS-server   : port 5300
+
 This role uses PowerDNS as the server and can be used for deployment of
 Active Directory.
 
@@ -35,6 +40,7 @@ this:
   tasks:
     - nsupdate:
         server: '127.0.0.1'
+        port: 5300
         ttl: '60'
         zone: 'sub.example.com'
         record: 'host'

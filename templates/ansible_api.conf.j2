@@ -6,6 +6,9 @@ webserver=yes
 webserver-port=8081
 webserver-address=127.0.0.1
 
+# Listen on a different port so we can also accomodate the recursor
+local-port=5300
+
 # DNS update is used to register/update systems
 dnsupdate=yes
 allow-dnsupdate-from=127.0.0.0/8{% if dns_server_ad_enabled %}, {{ dns_server_ad_dc_ip }} {% endif %}
