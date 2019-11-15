@@ -6,7 +6,9 @@
   template:
     src: "{{ template.src }}"
     dest: "{{ template.dest }}"
-  notify: 'restart pdns'
+  notify:
+    - 'restart pdns'
+    - 'restart pdns-recursor'
   loop:
     - { src: 'ansible_api.conf.j2', dest: '/etc/powerdns/pdns.d/ansible_api.conf' }
     - { src: 'recursor.conf.j2', dest: '/etc/powerdns/recursor.conf' }
