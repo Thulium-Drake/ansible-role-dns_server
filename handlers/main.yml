@@ -1,10 +1,10 @@
 ---
 - name: 'restart pdns'
   service:
-    name: "{{ service }}"
+    name: 'pdns'
     state: 'restarted'
-  loop:
-    - 'pdns'
-    - 'pdns-recursor'
-  loop_control:
-    loop_var: 'service'
+
+- name: 'restart pdns-recursor'
+  service:
+    name: 'pdns-recursor'
+    state: 'restarted'
