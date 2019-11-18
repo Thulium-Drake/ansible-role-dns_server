@@ -67,11 +67,12 @@
         soa: "_msdcs.{{dns_server_ns_name }}. hostmaster.{{ dns_server_zone}}. 1 600 600 604800 600"
     - name: 'Ensure NS record'
       nsupdate:
+        state: 'present'
         server: "{{ dns_server_address }}"
         port: "{{ dns_server_port }}"
         ttl: '60'
         zone: "_msdcs.{{ dns_server_zone }}"
-        record: "_msdcs.{{ dns_server_zone }}"
+        record: "_msdcs.{{ dns_server_zone }}."
         value: "{{ dns_server_ns_name }}."
         type: 'NS'
       register: 'dns_updated'
