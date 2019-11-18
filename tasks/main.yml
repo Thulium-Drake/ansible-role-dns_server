@@ -71,7 +71,7 @@
         port: "{{ dns_server_port }}"
         ttl: '60'
         zone: "_msdcs.{{ dns_server_zone }}"
-        record: "{{ dns_server_zone }}."
+        record: "_msdcs.{{ dns_server_zone }}"
         value: "{{ dns_server_ns_name }}."
         type: 'NS'
       register: 'dns_updated'
