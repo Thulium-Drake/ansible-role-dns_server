@@ -38,7 +38,7 @@
     action: 'master'
     ttl: 3600
     nsset: "{{ dns_server_ns_name }}."
-    soa: "{{dns_server_ns_name }}. hostmaster.{{ dns_server_zone}}. 1 600 600 604800 600"
+    soa: "{{ dns_server_ns_name }}. hostmaster.{{ dns_server_zone }}. 1 600 600 604800 600"
 
 - name: 'Ensure NS record'
   nsupdate:
@@ -56,7 +56,8 @@
 
 - name: 'Create Active Directory zone'
   block:
-    - pdns_zone:
+    - name: 'Ensure zone'
+      pdns_zone:
         api_host: '127.0.0.1'
         api_port: 8081
         api_key: "{{ dns_server_api_key }}"
@@ -64,7 +65,7 @@
         action: 'master'
         ttl: 3600
         nsset: "{{ dns_server_ns_name }}."
-        soa: "_msdcs.{{dns_server_ns_name }}. hostmaster.{{ dns_server_zone}}. 1 600 600 604800 600"
+        soa: "_msdcs.{{ dns_server_ns_name }}. hostmaster.{{ dns_server_zone }}. 1 600 600 604800 600"
     - name: 'Ensure NS record'
       nsupdate:
         state: 'present'

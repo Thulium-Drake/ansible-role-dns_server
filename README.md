@@ -19,6 +19,8 @@ an environment with CentOS/RHEL on hand when developing this.
 This role uses JP Mens' pdns_zone module for Ansible, you can find it, and it's
 documentation [on his Github](https://github.com/jpmens/ansible-m-pdns_zone)
 
+NOTE: This module does not work with PDNS 4.1 or higher(all tests I have ran failed)
+
 You need to install this module in your Ansible project by placing it in
 ```
 ansible_root/modules/pdns_zone.py
@@ -41,10 +43,10 @@ this:
   host: 'ns-sub.example.com'
   tasks:
     - nsupdate:
-        server: '127.0.0.1'
-        port: 5300
+        server: "{{ dns_server_address }}"
+        port: "{{ dns_server_port }}"
         ttl: '60'
-        zone: 'sub.example.com'
+        zone: "{{ dns_server_zone }}"
         record: 'host'
         value: '192.168.1.1'
         type: 'A'

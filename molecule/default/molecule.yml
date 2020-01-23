@@ -8,8 +8,8 @@ lint:
   options:
     config-file: 'molecule/default/yamllint.yml'
 platforms:
-  - name: "molecule-instance"
-    image: "geerlingguy/docker-${MOLECULE_DISTRO:-debian9}-ansible:latest"
+  - name: "molecule-dns"
+    image: "geerlingguy/docker-${MOLECULE_DISTRO:-debian10}-ansible:latest"
     command: '/lib/systemd/systemd'
     pre_build_image: true
     volumes:
@@ -20,6 +20,6 @@ provisioner:
   lint:
     name: 'ansible-lint'
 verifier:
-  name: 'testinfra'
+  name: 'ansible'
   lint:
-    name: 'flake8'
+    name: 'ansible-lint'

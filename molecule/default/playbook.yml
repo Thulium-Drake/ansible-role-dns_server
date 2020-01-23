@@ -3,4 +3,21 @@
   hosts: all
   roles:
     - name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
-  vars:
+  tasks:
+    - name: 'Register test record'
+      nsupdate:
+        server: "{{ dns_server_address }}"
+        port: "{{ dns_server_port }}"
+        ttl: '60'
+        zone: "{{ dns_server_zone }}"
+        record: "{{ host.name }}"
+        value: "{{ host.ip_addr }}"
+        type: 'A'
+      register: 'dns_updated'
+      retries: 3
+      delay: 3
+      until: not dns_updated.failed
+      loop:
+        - { name: 'some-host', ip_addr: '192.168.1.1' }
+      loop_control:
+        loop_var: 'host'

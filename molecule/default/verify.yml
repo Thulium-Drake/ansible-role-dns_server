@@ -1,0 +1,27 @@
+---
+- name: "Verify"
+  hosts: 'all'
+  check_mode: true
+  gather_facts: false
+  tasks:
+    - name: 'Check if pdns is running'
+      service:
+        name: "{{ service }}"
+        state: 'started'
+      loop:
+        - 'pdns'
+        - 'pdns-recursor'
+      loop_control:
+        loop_var: 'service'
+
+    - name: 'Check if test record exists'
+      command: 'dig +short some-host.sub.example.com @127.0.0.1'
+      register: 'r'
+      check_mode: false
+      changed_when: false
+      delegate_to: 'molecule-dns'
+
+    - name: 'Check result (skip is OK)'
+      fail:
+        msg: 'ERROR, test failed!'
+      when: r.stdout != '192.168.1.1'
