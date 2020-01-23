@@ -29,9 +29,18 @@ local Converge(distro) = {
           "pip install -U ansible molecule",
           "molecule lint",
           "molecule syntax"
-        ]
+        ],
+        privileged: true,
+        volumes: [
+          { name: "docker", path: "/var/run/docker.sock" },
+        ],
       }
-    ]
+    ],
+    volumes: [
+      { name: "docker",
+        host: { path: "/var/run/docker.sock" },
+      },
+    ],
   },
   {
     kind: "pipeline",
