@@ -1,8 +1,7 @@
 local Converge(distro) = {
   name: "Converge - "+distro,
-  image: "quay.io/ansible/molecule",
+  image: "registry.element-networks.nl/tools/molecule",
   commands: [
-    "pip install -U ansible molecule",
     "molecule destroy",
     "molecule converge",
     "molecule idempotence",
@@ -24,9 +23,8 @@ local Converge(distro) = {
     steps: [
       {
         name: "Lint code",
-        image: "quay.io/ansible/molecule",
+        image: "registry.element-networks.nl/tools/molecule",
         commands: [
-          "pip install -U ansible molecule",
           "molecule lint",
           "molecule syntax"
         ],
@@ -38,7 +36,7 @@ local Converge(distro) = {
     ],
     volumes: [
       { name: "docker",
-        host: { path: "/var/run/docker.sock" },
+        host: { path: "/var/run/docker.sock" }
       },
     ],
   },
@@ -66,7 +64,7 @@ local Converge(distro) = {
     steps: [
       {
         name: "Ansible Galaxy",
-        image: "quay.io/ansible/molecule",
+        image: "registry.element-networks.nl/tools/molecule",
         commands: [
           "ansible-galaxy login --github-token $$GITHUB_TOKEN",
           "ansible-galaxy import Thulium-Drake ansible-role-dns_server --role-name=dns_server",
