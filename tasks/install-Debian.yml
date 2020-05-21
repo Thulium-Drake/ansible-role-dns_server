@@ -5,7 +5,7 @@
       - 'pdns-server'
       - 'pdns-recursor'
       - "pdns-backend-{{ dns_server_backend }}"
-      - 'python-dnspython'
+      - 'python3-dnspython'
       - 'dnsutils'
     state: 'present'
     update_cache: true
