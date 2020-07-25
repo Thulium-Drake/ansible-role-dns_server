@@ -2,7 +2,7 @@
 config-dir=/etc/powerdns
 hint-file=/usr/share/dns/root.hints
 local-address={{ dns_recursor_address }}
-forward-zones={{ dns_server_zone }}={{ dns_server_address}}:{{ dns_server_port }}
+forward-zones={% for zone in dns_server_zones %}{{ zone }}={{ dns_server_address}}:{{ dns_server_port }}{{ "," if not loop.last else "" }}{% endfor %}
 quiet=yes
 security-poll-suffix=
 setgid=pdns

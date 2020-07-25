@@ -3,9 +3,42 @@
   apt:
     name:
       - 'pdns-server'
-      - 'pdns-recursor'
       - "pdns-backend-{{ dns_server_backend }}"
       - 'python3-dnspython'
+      - 'python3-requests'
       - 'dnsutils'
     state: 'present'
     update_cache: true
+
+- name: 'Install PowerDNS'
+  apt:
+    name:
+      - 'pdns-recursor'
+  when: dns_recursor_enabled
+
+- name: 'Remove default BIND config from package'
+  file:
+    path: '/etc/powerdns/pdns.d/bind.conf'
+    state: 'absent'
+  notify:
+    - 'restart pdns'
+
+- name: 'Configure SQLite backend'
+  block:
+    - name: 'Install dependencies'
+      apt:
+        name: 'sqlite3'
+        state: 'present'
+    - name: 'Place config'
+      copy:
+        src: '/usr/share/doc/pdns-backend-sqlite3/examples/pdns.local.gsqlite3.conf'
+        dest: '/etc/powerdns/pdns.d/sqlite.conf'
+        remote_src: true
+    - name: 'Setup SQLite database file'
+      shell: |
+        /usr/bin/sqlite3 \
+        /var/lib/powerdns/pdns.sqlite3 < /usr/share/pdns-backend-sqlite3/schema/schema.sqlite3.sql
+        chown -R pdns:pdns /var/lib/powerdns
+      args:
+        creates: '/var/lib/powerdns/pdns.sqlite3'
+  when: dns_server_backend == 'sqlite3'

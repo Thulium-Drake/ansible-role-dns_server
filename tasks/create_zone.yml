@@ -1,0 +1,27 @@
+---
+- name: 'Check zone'
+  uri:
+    url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones/{{ zone }}."
+    method: 'GET'
+    headers:
+      X-API-Key: "{{ dns_server_api_key }}"
+    status_code:
+      - 200
+      - 422
+  register: 'zone_api_status'
+
+- name: 'Ensure zone'
+  uri:
+    url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
+    method: 'POST'
+    body:
+      name: "{{ zone }}."
+      kind: 'master'
+      nameservers:
+        - "{{ dns_server_ns_name }}."
+    body_format: 'json'
+    headers:
+      X-API-Key: "{{ dns_server_api_key }}"
+    status_code: 201
+  changed_when: true
+  when: zone_api_status['status'] != 200

@@ -5,21 +5,26 @@ dns_server_backend: 'sqlite3'
 # Key used by Ansible to communicate with PowerDNS' API
 dns_server_api_key: 'very_secure_random_password_which_is_also_very_long'
 
-# Name of the zone
-dns_server_zone: 'sub.example.com'
+# List of zones to create
+dns_server_zones:
+  - 'sub.example.com'
+  - '_msdcs.sub.example.com'
+  - 'other.example.com'
 
 # Port and listen address for the Authoritative server
 dns_server_address: '127.0.0.1'
 dns_server_port: 5300
 
+# Hostname under which the nameserver is reachable
+dns_server_ns_name: 'ns.example.com'
+
+# List of IP addresses that are allowed NSUPDATE (e.g. AD DC's)
+dns_server_nsupdate_ips:
+  - '192.168.1.2'
+  - '192.168.1.3'
+
+# Disable the recursor if desired, check the port and listen address above!
+dns_recursor_enabled: true
+
 # Listen address for the Recursor
 dns_recursor_address: '0.0.0.0'
-
-# Hostname under which the nameserver is reachable
-dns_server_ns_name: 'ns-sub.example.com'
-
-# When set to true, create a zone for an AD DC to update
-dns_server_ad_enabled: false
-
-# IP address for the AD DC for use with nsupdate
-dns_server_ad_dc_ip: '192.168.1.2'

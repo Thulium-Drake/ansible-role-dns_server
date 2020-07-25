@@ -15,69 +15,22 @@
     dest: '/etc/powerdns/recursor.conf'
   notify:
     - 'restart pdns-recursor'
+  when: dns_recursor_enabled
 
-- name: 'Enable services'
+- name: 'Enable Authoratative server'
   service:
-    name: "{{ service }}"
+    name: 'pdns'
     state: 'started'
     enabled: true
-  loop:
-    - 'pdns'
-    - 'pdns-recursor'
+
+- name: 'Enable Recusrive server'
+  service:
+    name: 'pdns-recursor'
+    state: 'started'
+    enabled: true
+
+- name: 'Create zones'
+  include_tasks: 'create_zone.yml'
+  loop: "{{ dns_server_zones }}"
   loop_control:
-    loop_var: 'service'
-
-- meta: 'flush_handlers'
-
-- name: 'Ensure zone'
-  pdns_zone:
-    api_host: '127.0.0.1'
-    api_port: 8081
-    api_key: "{{ dns_server_api_key }}"
-    zone: "{{ dns_server_zone }}"
-    action: 'master'
-    ttl: 3600
-    nsset: "{{ dns_server_ns_name }}."
-    soa: "{{ dns_server_ns_name }}. hostmaster.{{ dns_server_zone }}. 1 600 600 604800 600"
-
-- name: 'Ensure NS record'
-  nsupdate:
-    server: "{{ dns_server_address }}"
-    port: "{{ dns_server_port }}"
-    ttl: '60'
-    zone: "{{ dns_server_zone }}"
-    record: "{{ dns_server_zone }}."
-    value: "{{ dns_server_ns_name }}."
-    type: 'NS'
-  register: 'dns_updated'
-  retries: 3
-  delay: 3
-  until: not dns_updated.failed
-
-- name: 'Create Active Directory zone'
-  block:
-    - name: 'Ensure zone'
-      pdns_zone:
-        api_host: '127.0.0.1'
-        api_port: 8081
-        api_key: "{{ dns_server_api_key }}"
-        zone: "_msdcs.{{ dns_server_zone }}"
-        action: 'master'
-        ttl: 3600
-        nsset: "{{ dns_server_ns_name }}."
-        soa: "_msdcs.{{ dns_server_ns_name }}. hostmaster.{{ dns_server_zone }}. 1 600 600 604800 600"
-    - name: 'Ensure NS record'
-      nsupdate:
-        state: 'present'
-        server: "{{ dns_server_address }}"
-        port: "{{ dns_server_port }}"
-        ttl: '60'
-        zone: "_msdcs.{{ dns_server_zone }}"
-        record: "_msdcs.{{ dns_server_zone }}."
-        value: "{{ dns_server_ns_name }}."
-        type: 'NS'
-      register: 'dns_updated'
-      retries: 3
-      delay: 3
-      until: not dns_updated.failed
-  when: dns_server_ad_enabled | bool
+    loop_var: 'zone'
