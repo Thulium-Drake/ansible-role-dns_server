@@ -13,6 +13,9 @@ dns_server_db_password: 'secret'
 # Key used by Ansible to communicate with PowerDNS' API
 dns_server_api_key: 'very_secure_random_password_which_is_also_very_long'
 
+# Default TTL for records
+dns_server_default_ttl: 300
+
 # List of zones to create
 dns_server_zones:
   - 'sub.example.com'
@@ -30,6 +33,15 @@ dns_server_ns_name: 'ns.example.com'
 dns_server_nsupdate_ips:
   - '192.168.1.2'
   - '192.168.1.3'
+
+# Node role and relatives
+dns_server_role: 'master'
+
+# If the node is a master, add a list of slave IPs here
+dns_server_slaves: []
+
+# If the node is a slave, add a list of master IPs here
+dns_server_masters: []
 
 # Disable the recursor if desired, check the port and listen address above!
 dns_recursor_enabled: true

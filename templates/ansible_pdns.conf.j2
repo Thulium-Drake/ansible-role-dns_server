@@ -1,0 +1,33 @@
+# {{ ansible_managed }}
+# API access for zone manipulation
+api=yes
+api-key={{ dns_server_api_key }}
+webserver=yes
+webserver-port=8081
+webserver-address=127.0.0.1
+
+# Port and listen address
+local-address={{ dns_server_address }}
+local-port={{ dns_server_port }}
+
+# Node role and settings
+{{ dns_server_role }}=yes
+{% if dns_server_role == 'master' -%}
+# Allow transfer to slaves and notify them
+allow-axfr-ips={% for ip in dns_server_slaves %}{{ ip }}{{ ", " if not loop.last else "" }}{% endfor %}
+
+also-notify={% for ip in dns_server_slaves %}{{ ip }}{{ ", " if not loop.last else "" }}{% endfor %}
+{% endif -%}
+
+{% if dns_server_role == 'slave' -%}
+# Allow notifications from master
+allow-notify-from={% for ip in dns_server_masters %}{{ ip }}{{ ", " if not loop.last else "" }}{% endfor %}
+{%- endif %}
+
+# DNS update is used to register/update systems
+dnsupdate=yes
+allow-dnsupdate-from=127.0.0.0/8, {{ dns_server_address }} {% for ip in dns_server_nsupdate_ips %}, {{ ip }}{% endfor %}
+
+# Defaults
+default-soa-name={{ dns_server_ns_name }}
+default-ttl={{ dns_server_default_ttl }}

@@ -9,8 +9,8 @@
 
 - name: 'Ensure API settings'
   template:
-    src: 'ansible_api.conf.j2'
-    dest: '/etc/powerdns/pdns.d/ansible_api.conf'
+    src: 'ansible_pdns.conf.j2'
+    dest: '/etc/powerdns/pdns.d/ansible_pdns.conf'
   notify:
     - 'restart pdns'
 
