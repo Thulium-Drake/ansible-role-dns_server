@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+# MySQL Configuration
+launch+=gmysql
+
+# gmysql parameters
+gmysql-host={{ dns_server_db_server }}
+gmysql-port={{ dns_server_db_port }}
+gmysql-dbname={{ dns_server_db_name }}
+gmysql-user={{ dns_server_db_user }}
+gmysql-password={{ dns_server_db_password }}
+gmysql-dnssec=yes
