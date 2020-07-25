@@ -33,6 +33,8 @@
       copy:
         src: 'pdns_sqlite.conf'
         dest: '/etc/powerdns/pdns.d/sqlite.conf'
+      notify:
+        - 'restart pdns'
     - name: 'Setup SQLite database file'
       shell: |
         /usr/bin/sqlite3 \
@@ -41,3 +43,13 @@
       args:
         creates: '/var/lib/powerdns/pdns.sqlite3'
   when: dns_server_backend == 'sqlite3'
+
+- name: 'Configure Mariadb backend'
+  block:
+    - name: 'Place config'
+      template:
+        src: 'pdns_mysql.conf.j2'
+        dest: '/etc/powerdns/pdns.d/mysql.conf'
+      notify:
+        - 'restart pdns'
+  when: dns_server_backend == 'mysql'

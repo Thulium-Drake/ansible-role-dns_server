@@ -1,4 +1,9 @@
 ---
+- name: 'Check input, skip is OK'
+  fail:
+    msg: 'Unsupported backend!'
+  when: dns_server_backend not in supported_backends
+
 - name: 'Install packages'
   include_tasks: "install-{{ ansible_os_family }}.yml"
 
