@@ -7,10 +7,11 @@
       X-API-Key: "{{ dns_server_api_key }}"
     status_code:
       - 200
+      - 404
       - 422
   register: 'zone_api_status'
 
-- name: 'Ensure zone'
+- name: 'Ensure master zone'
   uri:
     url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
     method: 'POST'
@@ -24,4 +25,23 @@
       X-API-Key: "{{ dns_server_api_key }}"
     status_code: 201
   changed_when: true
-  when: zone_api_status['status'] != 200
+  when:
+   - zone_api_status['status'] != 200
+   - dns_server_role == 'master'
+
+- name: 'Ensure slave zone'
+  uri:
+    url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
+    method: 'POST'
+    body:
+      name: "{{ zone }}."
+      kind: 'slave'
+      masters: "{{ dns_server_masters }}"
+    body_format: 'json'
+    headers:
+      X-API-Key: "{{ dns_server_api_key }}"
+    status_code: 201
+  changed_when: true
+  when:
+   - zone_api_status['status'] != 200
+   - dns_server_role == 'slave'
