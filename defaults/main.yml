@@ -48,4 +48,3 @@ dns_recursor_enabled: true
 
 # Listen address for the Recursor
 dns_recursor_address: '0.0.0.0'
-
