@@ -23,7 +23,7 @@
     state: 'started'
     enabled: true
 
-- name: 'Enable Recusrive server'
+- name: 'Enable Recursive server'
   service:
     name: 'pdns-recursor'
     state: 'started'
