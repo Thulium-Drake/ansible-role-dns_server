@@ -35,6 +35,8 @@
     enabled: true
   when: dns_recursor_enabled
 
+- meta: 'flush_handlers'
+
 - name: 'Create zones'
   include_tasks: 'create_zone.yml'
   loop: "{{ dns_server_zones }}"
