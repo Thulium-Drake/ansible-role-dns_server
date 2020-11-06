@@ -12,6 +12,7 @@
           Acquire::Check-Valid-Until "false";
           Acquire::AllowInsecureRepositories "true";
           Acquire::AllowDowngradeToInsecureRepositories "true";
+          APT::Get::AllowUnauthenticated "true";
     - name: 'Add PowerDNS repo for 4.4.x'
       copy:
         dest: '/etc/apt/sources.list.d/pdns.list'
