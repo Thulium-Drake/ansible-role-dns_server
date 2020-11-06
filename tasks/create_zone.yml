@@ -11,20 +11,30 @@
       - 422
   register: 'zone_api_status'
 
-- name: 'Ensure master zone'
-  uri:
-    url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
-    method: 'POST'
-    body:
-      name: "{{ zone }}."
-      kind: 'master'
-      nameservers:
-        - "{{ dns_server_ns_name }}."
-    body_format: 'json'
-    headers:
-      X-API-Key: "{{ dns_server_api_key }}"
-    status_code: 201
-  changed_when: true
+- block:
+  - name: 'Ensure master zone'
+    uri:
+      url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
+      method: 'POST'
+      body:
+        name: "{{ zone }}."
+        kind: 'master'
+        nameservers:
+          - "{{ dns_server_ns_name }}."
+      body_format: 'json'
+      headers:
+        X-API-Key: "{{ dns_server_api_key }}"
+      status_code: 201
+    changed_when: true
+
+  - name: 'Render default empty zone'
+    template:
+      src: 'default_zone.j2'
+      dest: "/tmp/{{ zone }}.txt"
+
+  - name: 'Import default empty zone'
+    shell: |
+      pdnsutil load-zone {{ zone }} /tmp/{{ zone }}.txt
   when:
    - zone_api_status['status'] != 200
    - dns_server_role == 'master'

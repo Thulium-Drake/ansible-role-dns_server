@@ -1,0 +1,3 @@
+$ORIGIN .
+{{ zone }} {{ dns_server_default_ttl }} IN SOA {{ dns_server_ns_name }} hostmaster.{{ zone }} 2020010101 600 600 604800 600
+{{ zone }} {{ dns_server_default_ttl }} IN NS {{ dns_server_ns_name }}.

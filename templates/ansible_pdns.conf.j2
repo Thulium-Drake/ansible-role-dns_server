@@ -29,5 +29,4 @@ dnsupdate=yes
 allow-dnsupdate-from=127.0.0.0/8, {{ dns_server_address }} {% for ip in dns_server_nsupdate_ips %}, {{ ip }}{% endfor %}
 
 # Defaults
-default-soa-name={{ dns_server_ns_name }}
 default-ttl={{ dns_server_default_ttl }}

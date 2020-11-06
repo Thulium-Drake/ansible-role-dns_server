@@ -32,6 +32,10 @@ dns_server_ns_name: 'ns.example.com'
 # List of IP addresses that are allowed NSUPDATE (e.g. AD DC's)
 dns_server_nsupdate_ips: []
 
+# TSIG settings
+dns_server_tsig_key_name: ''
+dns_server_tsig_key_value: ''
+
 # Node role and relatives
 dns_server_role: 'master'
 

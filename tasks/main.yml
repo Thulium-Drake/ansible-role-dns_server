@@ -1,23 +1,107 @@
 ---
-- name: 'Check input, skip is OK'
-  fail:
-    msg: 'Unsupported backend!'
-  when: dns_server_backend not in supported_backends
+- name: 'Include OS specific vars'
+  include_vars: "{{ ansible_facts['os_family'] }}.yml"
+  no_log: true
 
-- name: 'Install packages'
-  include_tasks: "install-{{ ansible_os_family }}.yml"
+- name: 'Install PowerDNS'
+  package:
+    name:
+      - "{{ dns_server_pdns_auth_pkg }}"
+      - "pdns-backend-{{ dns_server_backend }}"
+      - "{{ dns_server_python_dns_pkg }}"
+      - "{{ dns_server_python_requests_pkg }}"
+      - "{{ dns_server_nsupdate_pkg }}"
+    state: 'present'
+
+- name: 'Install PowerDNS'
+  package:
+    name:
+      - 'pdns-recursor'
+  when: dns_recursor_enabled
+
+- name: 'Ensure conf dirs'
+  file:
+    path: "{{ dir }}"
+    state: 'directory'
+    owner: 'pdns'
+    group: 'pdns'
+  loop:
+    - "{{ dns_server_basedir }}/pdns.d"
+    - '/var/lib/powerdns'
+  loop_control:
+    loop_var: 'dir'
+
+- name: 'Ensure base config'
+  copy:
+    dest: "{{ dns_server_basedir }}/pdns.conf"
+    content: |
+      # This file is managed with Ansible, your changes will be lost!
+      setgid=pdns
+      setuid=pdns
+      include-dir={{ dns_server_basedir }}/pdns.d
+      launch=
+    owner: 'pdns'
+    group: 'pdns'
+  notify:
+    - 'restart pdns'
+
+- name: 'Remove default BIND config from package'
+  file:
+    path: "{{ dns_server_basedir }}/pdns.d/bind.conf"
+    state: 'absent'
+  notify:
+    - 'restart pdns'
+
+- name: 'Configure SQLite backend'
+  block:
+    - name: 'Install dependencies'
+      package:
+        name: "{{ dns_server_sqlite_pkg }}"
+        state: 'present'
+    - name: 'Place config'
+      copy:
+        src: 'pdns_sqlite.conf'
+        dest: "{{ dns_server_basedir }}/pdns.d/sqlite.conf"
+        owner: 'pdns'
+        group: 'pdns'
+      notify:
+        - 'restart pdns'
+    - name: 'Setup SQLite database file'
+      shell: |
+        /usr/bin/sqlite3 \
+        /var/lib/powerdns/pdns.sqlite3 < {{ dns_server_sqlite_schema }}
+        chown -R pdns:pdns /var/lib/powerdns
+      args:
+        creates: '/var/lib/powerdns/pdns.sqlite3'
+  when: dns_server_backend == 'sqlite3' or dns_server_backend == 'sqlite'
+
+- name: 'Configure Mariadb backend'
+  block:
+    - name: 'Place config'
+      template:
+        src: 'pdns_mysql.conf.j2'
+        dest: "{{ dns_server_basedir }}/pdns.d/mysql.conf"
+        owner: 'pdns'
+        group: 'pdns'
+      notify:
+        - 'restart pdns'
+  when: dns_server_backend == 'mysql'
 
 - name: 'Ensure API settings'
   template:
     src: 'ansible_pdns.conf.j2'
-    dest: '/etc/powerdns/pdns.d/ansible_pdns.conf'
+    dest: "{{ dns_server_basedir }}/pdns.d/ansible_pdns.conf"
+    owner: 'pdns'
+    group: 'pdns'
   notify:
     - 'restart pdns'
 
 - name: 'Ensure recursor settings'
   template:
     src: 'recursor.conf.j2'
-    dest: '/etc/powerdns/recursor.conf'
+    dest: "{{ dns_server_basedir }}/recursor.conf"
+    owner: 'pdns'
+    group: 'pdns'
   notify:
     - 'restart pdns-recursor'
   when: dns_recursor_enabled
@@ -35,6 +119,14 @@
     enabled: true
   when: dns_recursor_enabled
 
+- name: 'Configure firewalld'
+  ansible.posix.firewalld:
+    service: 'dns'
+    permanent: true
+    immediate: true
+    state: 'enabled'
+  when: ansible_facts['os_family'] == 'RedHat'
+
 - meta: 'flush_handlers'
 
 - name: 'Create zones'
@@ -42,3 +134,13 @@
   loop: "{{ dns_server_zones }}"
   loop_control:
     loop_var: 'zone'
+
+- name: 'Activate TSIG keys'
+  include_tasks: 'enable_tsig_zone.yml'
+  loop: "{{ dns_server_zones }}"
+  loop_control:
+    loop_var: 'zone'
+  when:
+    - dns_server_role == 'master'
+    - dns_server_tsig_key_name != ''
+    - dns_server_tsig_key_value != ''

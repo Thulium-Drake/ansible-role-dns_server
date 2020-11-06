@@ -1,0 +1,5 @@
+---
+- name: 'Import and activate TSIG keys'
+  shell: |
+    pdnsutil import-tsig-key {{ dns_server_tsig_key_name }} hmac-md5 '{{ dns_server_tsig_key_value }}'
+    pdnsutil activate-tsig-key {{ zone }} {{ dns_server_tsig_key_name }} master

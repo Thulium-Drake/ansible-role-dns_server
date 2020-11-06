@@ -1,0 +1,8 @@
+---
+dns_server_basedir: '/etc/powerdns'
+dns_server_pdns_auth_pkg: 'pdns-server'
+dns_server_nsupdate_pkg: 'dnsutils'
+dns_server_python_dns_pkg: 'python3-dnspython'
+dns_server_python_requests_pkg: 'python3-requests'
+dns_server_sqlite_pkg: 'sqlite3'
+dns_server_sqlite_schema: '/usr/share/pdns-backend-sqlite3/schema/schema.sqlite3.sql'
