@@ -3,13 +3,27 @@
   hosts: all
   vars:
     ansible_python_interpreter: '/usr/bin/python3'
-  roles:
-    - name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
   tasks:
+    - name: 'Prepare APT'
+      copy:
+        dest: '/etc/apt/apt.conf.d/disable_gpg.conf'
+        content: |
+          Acquire::Check-Valid-Until "false";
+          Acquire::AllowInsecureRepositories "true";
+          Acquire::AllowDowngradeToInsecureRepositories "true";
+    - name: 'Add PowerDNS repo for 4.4.x'
+      copy:
+        dest: '/etc/apt/sources.list.d/pdns.list'
+        content: |
+          deb http://repo.powerdns.com/debian buster-rec-44 main
+          deb http://repo.powerdns.com/debian buster-auth-44 main
+    - name: 'Run role'
+      include_role:
+        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
     - name: 'Register test record'
       nsupdate:
-        server: "{{ dns_server_address }}"
-        port: "{{ dns_server_port }}"
+        server: '127.0.0.1'
+        port: 5300
         ttl: '60'
         zone: "{{ zone }}"
         record: "some-host"
