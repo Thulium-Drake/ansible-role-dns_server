@@ -7,6 +7,7 @@
     - name: 'Prepare APT'
       copy:
         dest: '/etc/apt/apt.conf.d/disable_gpg.conf'
+        mode: 0644
         content: |
           Acquire::Check-Valid-Until "false";
           Acquire::AllowInsecureRepositories "true";
@@ -14,6 +15,7 @@
     - name: 'Add PowerDNS repo for 4.4.x'
       copy:
         dest: '/etc/apt/sources.list.d/pdns.list'
+        mode: 0644
         content: |
           deb http://repo.powerdns.com/debian buster-rec-44 main
           deb http://repo.powerdns.com/debian buster-auth-44 main
