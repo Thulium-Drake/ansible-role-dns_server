@@ -35,6 +35,7 @@ dns_server_nsupdate_ips: []
 # TSIG settings
 dns_server_tsig_key_name: ''
 dns_server_tsig_key_value: ''
+dns_server_tsig_key_algo: 'sha256'
 
 # Node role and relatives
 dns_server_role: 'master'
