@@ -66,6 +66,10 @@
         group: 'pdns'
       notify:
         - 'restart pdns'
+
+    - name: 'Collect package version'
+      package_facts:
+
     - name: 'Setup SQLite database file'
       shell: |
         /usr/bin/sqlite3 \

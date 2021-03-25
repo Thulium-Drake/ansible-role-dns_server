@@ -5,4 +5,4 @@ dns_server_nsupdate_pkg: 'bind-utils'
 dns_server_python_dns_pkg: 'python-dns'
 dns_server_python_requests_pkg: 'python-requests'
 dns_server_sqlite_pkg: 'sqlite'
-dns_server_sqlite_schema: '/usr/share/doc/pdns-backend-sqlite-4.4.0/schema.sqlite3.sql'
+dns_server_sqlite_schema: "/usr/share/doc/pdns-backend-sqlite-{{ ansible_facts['packages']['pdns-backend-sqlite'][0]['version'] }}/schema.sqlite3.sql"
