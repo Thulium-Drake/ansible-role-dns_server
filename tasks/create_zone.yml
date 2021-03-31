@@ -57,7 +57,7 @@
    - zone_api_status['status'] != 200
    - dns_server_role == 'slave'
 
-- name: "Activate TSIG keys for {{ zone }}"
+- name: "Activate DNSUPDATE TSIG keys for {{ zone }}"
   shell: |
     result=1
     pdnsutil get-meta {{ zone }} TSIG-ALLOW-DNSUPDATE | grep {{ dns_server_tsig_key_name }}
@@ -65,8 +65,7 @@
     if [ $ret -eq 1 ]
     then
       pdnsutil activate-tsig-key {{ zone }} {{ dns_server_tsig_key_name }} {{ dns_server_role }}
-      {% if dns_server_role == 'master' %}pdnsutil set-meta {{ zone }} TSIG-ALLOW-DNSUPDATE {{ dns_server_tsig_key_name }}{% endif %}
-
+      pdnsutil set-meta {{ zone }} TSIG-ALLOW-DNSUPDATE {{ dns_server_tsig_key_name }}
       result=2
     else
       result=0
@@ -78,5 +77,29 @@
   changed_when: tsig_key_activate['rc'] == 2
   failed_when: tsig_key_activate['rc'] == 1
   when:
+    - dns_server_role == 'master'
+    - dns_server_tsig_key_name != ''
+    - dns_server_tsig_key_value != ''
+
+- name: "Activate TSIG keys for {{ zone }}"
+  shell: |
+    result=1
+    pdnsutil get-meta {{ zone }} AXFR-MASTER-TSIG | grep {{ dns_server_tsig_key_name }}
+    ret=$?
+    if [ $ret -eq 1 ]
+    then
+      pdnsutil activate-tsig-key {{ zone }} {{ dns_server_tsig_key_name }} {{ dns_server_role }}
+      result=2
+    else
+      result=0
+    fi
+    exit $result
+  args:
+    executable: '/bin/bash'
+  register: 'tsig_key_activate'
+  changed_when: tsig_key_activate['rc'] == 2
+  failed_when: tsig_key_activate['rc'] == 1
+  when:
+    - dns_server_role == 'slave'
     - dns_server_tsig_key_name != ''
     - dns_server_tsig_key_value != ''
