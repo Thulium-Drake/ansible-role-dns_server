@@ -160,4 +160,3 @@
   loop: "{{ dns_server_zones }}"
   loop_control:
     loop_var: 'zone'
-
