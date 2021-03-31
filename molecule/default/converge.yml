@@ -3,6 +3,9 @@
   hosts: all
   vars:
     ansible_python_interpreter: '/usr/bin/python3'
+    dns_server_tsig_key_name: 'rndc-key'
+    dns_server_tsig_key_value: 'FcE9ugD2zkWy/r5xkLIFZQ=='
+    dns_server_tsig_key_algo: 'hmac-md5'
   tasks:
     - name: 'Prepare APT'
       copy:
@@ -32,6 +35,9 @@
         record: "some-host"
         value: '192.168.1.1'
         type: 'A'
+        key_algorithm: "{{ dns_server_tsig_key_algo }}"
+        key_name: "{{ dns_server_tsig_key_name }}"
+        key_secret: "{{ dns_server_tsig_key_value }}"
       register: 'dns_updated'
       retries: 3
       delay: 3

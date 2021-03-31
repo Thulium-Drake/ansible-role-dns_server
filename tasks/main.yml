@@ -133,18 +133,31 @@
 
 - meta: 'flush_handlers'
 
+- name: 'Import TSIG keys'
+  shell: |
+    result=1
+    pdnsutil list-tsig-keys | grep '{{ dns_server_tsig_key_name }}. {{ dns_server_tsig_key_algo }}. {{ dns_server_tsig_key_value }}'
+    ret=$?
+    if [ $ret -eq 1 ]
+    then
+      pdnsutil import-tsig-key {{ dns_server_tsig_key_name }} {{ dns_server_tsig_key_algo }} '{{ dns_server_tsig_key_value }}'
+      result=2
+    else
+      result=0
+    fi
+    exit $result
+  args:
+    executable: '/bin/bash'
+  register: 'tsig_key_import'
+  changed_when: tsig_key_import['rc'] == 2
+  failed_when: tsig_key_import['rc'] == 1
+  when:
+    - dns_server_tsig_key_name != ''
+    - dns_server_tsig_key_value != ''
+
 - name: 'Create zones'
   include_tasks: 'create_zone.yml'
   loop: "{{ dns_server_zones }}"
   loop_control:
     loop_var: 'zone'
 
-- name: 'Activate TSIG keys'
-  include_tasks: 'enable_tsig_zone.yml'
-  loop: "{{ dns_server_zones }}"
-  loop_control:
-    loop_var: 'zone'
-  when:
-    - dns_server_role == 'master'
-    - dns_server_tsig_key_name != ''
-    - dns_server_tsig_key_value != ''
