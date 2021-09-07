@@ -1,0 +1,32 @@
+---
+- name: 'Ensure SELinux tools'
+  package:
+    name: "{{ dns_server_selinux_tools_pkg }}"
+    state: 'present'
+
+- name: 'Ensure PDNS type enforcement template'
+  copy:
+    src: 'pdns-ansible.te'
+    dest: '/etc/selinux/pdns-ansible.te'
+  register: 'selinux_policy_changed'
+
+- name: 'Compile and load SELinux policy module'
+  shell: |
+    checkmodule -M -m -o /etc/selinux/pdns-ansible.mod /etc/selinux/pdns-ansible.te
+    semodule_package -o /etc/selinux/pdns-ansible.pp -m /etc/selinux/pdns-ansible.mod
+    semodule -i /etc/selinux/pdns-ansible.pp
+  args:
+    creates: "{{ (selinux_policy_changed['changed']) | ternary(omit, '/etc/selinux/pdns-ansible.pp') }}"
+
+- name: 'Ensure correct SELinux file context configuration'
+  community.general.sefcontext:
+    target: '/var/lib/powerdns(/.*)?'
+    setype: 'pdns_conf_t'
+    state: 'present'
+
+- name: 'Allow to bind to udp high ports'
+  community.general.seport:
+    ports: '10000-20000'
+    proto: 'udp'
+    setype: 'dns_port_t'
+    state: 'present'

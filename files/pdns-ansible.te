@@ -1,0 +1,20 @@
+module pdns-ansible 1.0;
+
+require {
+	type var_lib_t;
+	type pdns_conf_t;
+	type pdns_t;
+	class file { map getattr write read create unlink };
+	class dir { add_name remove_name write };
+}
+
+#============= pdns_t ==============
+allow pdns_t pdns_conf_t:dir write;
+allow pdns_t pdns_conf_t:dir add_name;
+allow pdns_t pdns_conf_t:dir remove_name;
+allow pdns_t pdns_conf_t:file map;
+allow pdns_t pdns_conf_t:file unlink;
+allow pdns_t pdns_conf_t:file read;
+allow pdns_t pdns_conf_t:file write;
+allow pdns_t pdns_conf_t:file create;
+allow pdns_t var_lib_t:file getattr;

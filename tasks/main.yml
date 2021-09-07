@@ -1,6 +1,13 @@
 ---
 - name: 'Include OS specific vars'
-  include_vars: "{{ ansible_facts['os_family'] }}.yml"
+  include_vars: "{{ lookup('first_found', dns_server_vars) }}"
+  vars:
+    dns_server_vars:
+      files:
+        - "{{ ansible_facts['os_family'] }}{{ ansible_facts['distribution_major_version'] }}.yml"
+        - "{{ ansible_facts['os_family'] }}.yml"
+      paths:
+        - 'vars'
   no_log: true
 
 - name: 'Install PowerDNS'
@@ -12,6 +19,10 @@
       - "{{ dns_server_python_requests_pkg }}"
       - "{{ dns_server_nsupdate_pkg }}"
     state: 'present'
+
+- name: 'Run SELinux tasks'
+  include_tasks: 'selinux.yml'
+  when: ansible_facts['os_family'] == 'RedHat'
 
 - name: 'Install PowerDNS'
   package:
@@ -77,6 +88,10 @@
         chown -R pdns:pdns /var/lib/powerdns
       args:
         creates: '/var/lib/powerdns/pdns.sqlite3'
+
+    - name: 'Ensure SELinux file context'
+      command: restorecon -rv /var/lib/powerdns
+      when: ansible_facts['os_family'] == 'RedHat'
   when: dns_server_backend == 'sqlite3' or dns_server_backend == 'sqlite'
 
 - name: 'Configure Mariadb backend'
