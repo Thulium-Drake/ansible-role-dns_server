@@ -16,13 +16,13 @@
           Acquire::AllowInsecureRepositories "true";
           Acquire::AllowDowngradeToInsecureRepositories "true";
           APT::Get::AllowUnauthenticated "true";
-    - name: 'Add PowerDNS repo for 4.4.x'
+    - name: 'Add PowerDNS repo'
       copy:
         dest: '/etc/apt/sources.list.d/pdns.list'
         mode: 0644
         content: |
-          deb http://repo.powerdns.com/debian buster-rec-44 main
-          deb http://repo.powerdns.com/debian buster-auth-44 main
+          deb http://repo.powerdns.com/debian {{ ansible_facts['distribution_release'] }}-rec-46 main
+          deb http://repo.powerdns.com/debian {{ ansible_facts['distribution_release'] }}-auth-45 main
     - name: 'Run role'
       include_role:
         name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
