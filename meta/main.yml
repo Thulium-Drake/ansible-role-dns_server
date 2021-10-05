@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  author: 'Jeffrey van Pelt'
+  author: 'thulium_drake'
   description: 'Setup a local autoratative DNS server'
   company:
   role_name: 'dns_server'
@@ -12,6 +12,8 @@ galaxy_info:
   platforms:
     - name: 'Debian'
       versions:
+        - 'bullseye'
+        - 'buster'
         - 'stretch'
 
   galaxy_tags:
