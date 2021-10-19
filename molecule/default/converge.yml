@@ -7,22 +7,6 @@
     dns_server_tsig_key_value: 'FcE9ugD2zkWy/r5xkLIFZQ=='
     dns_server_tsig_key_algo: 'hmac-md5'
   tasks:
-    - name: 'Prepare APT'
-      copy:
-        dest: '/etc/apt/apt.conf.d/disable_gpg.conf'
-        mode: 0644
-        content: |
-          Acquire::Check-Valid-Until "false";
-          Acquire::AllowInsecureRepositories "true";
-          Acquire::AllowDowngradeToInsecureRepositories "true";
-          APT::Get::AllowUnauthenticated "true";
-    - name: 'Add PowerDNS repo'
-      copy:
-        dest: '/etc/apt/sources.list.d/pdns.list'
-        mode: 0644
-        content: |
-          deb http://repo.powerdns.com/debian {{ ansible_facts['distribution_release'] }}-rec-46 main
-          deb http://repo.powerdns.com/debian {{ ansible_facts['distribution_release'] }}-auth-45 main
     - name: 'Run role'
       include_role:
         name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
