@@ -25,3 +25,6 @@
         content: |
           deb http://repo.powerdns.com/debian {{ ansible_facts['distribution_release'] }}-rec-46 main
           deb http://repo.powerdns.com/debian {{ ansible_facts['distribution_release'] }}-auth-45 main
+    - name: 'Update APT cache'
+      apt:
+        update_cache: true
