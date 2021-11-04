@@ -4,9 +4,11 @@
   vars:
     ansible_python_interpreter: '/usr/bin/python3'
   tasks:
-    - name: 'Ensure gnupg2'
+    - name: 'Ensure cron and gnupg2'
       apt:
-        name: 'gnupg2'
+        name:
+          - 'gnupg2'
+          - 'cron'
         state: 'present'
         update_cache: true
     - name: 'Get APT GPG key to /tmp'

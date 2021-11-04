@@ -26,6 +26,10 @@ dns_server_zones:
 dns_server_address: '127.0.0.1'
 dns_server_port: 5300
 
+# If set to true, will provision infra to automatically generate reverse DNS
+# for all forward zones present on this server
+dns_server_autogen_reverse_dns: true
+
 # Hostname under which the nameserver is reachable
 dns_server_ns_name: 'ns.example.com'
 
