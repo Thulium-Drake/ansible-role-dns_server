@@ -49,7 +49,12 @@ for zone_dict in zones_json:
     zone_content_json = zone_content_r.json()
     for record in zone_content_json['rrsets']:
         if zone_dict['id'] == 'arpa.':
+            if record['type'] == 'NS':
+                ns_record_found = True
+                ns_record_data = record['records'][0]['content']
+                arpa_zone_contents.append(ns_record_data)
             if record['type'] == 'SOA':
+                soa_record_found = True
                 soa_record_data = dns.rdata.from_text(dns.rdataclass.IN, dns.rdatatype.SOA, record['records'][0]['content'])
                 new_serial = soa_record_data.serial + 1
                 new_soa_record = "arpa. 300 IN SOA {mname} {rname} {serial} {refresh} {retry} {expire} {minimum}".format(
@@ -69,6 +74,15 @@ for zone_dict in zones_json:
                 ptr_record = dns.reversename.from_address(ptr_ip)
                 arpa_zone_contents.append(str(ptr_record) + ' 300 IN PTR ' + ptr_host)
 
+if not soa_record_found:
+    default_soa_record = "arpa. 300 IN SOA {hostname} hostmaster.arpa 20200101 10800 3600 604800 3600".format(
+            hostname=os.uname().nodename)
+    arpa_zone_contents.append(default_soa_record)
+
+if not ns_record_found:
+    default_ns_record = "arpa. 300 IN NS {hostname}".format(
+            hostname=os.uname().nodename)
+    arpa_zone_contents.append(default_ns_record)
 
 with open("/tmp/reverse.zone", "w+") as z:
     z.truncate()
