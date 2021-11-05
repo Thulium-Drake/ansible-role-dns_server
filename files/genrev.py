@@ -42,6 +42,8 @@ zones_r = requests.get(zones_url, headers=api_auth_header)
 zones_json = zones_r.json()
 
 arpa_zone_contents = []
+soa_record_found = False
+ns_record_found = False
 
 for zone_dict in zones_json:
     zone_content_url = zones_url + '/' + zone_dict['id']
