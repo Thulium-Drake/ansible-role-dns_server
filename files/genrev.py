@@ -78,12 +78,12 @@ for zone_dict in zones_json:
 
 if not soa_record_found:
     default_soa_record = "arpa. 300 IN SOA {hostname} hostmaster.arpa 20200101 10800 3600 604800 3600".format(
-            hostname=os.uname().nodename)
+            hostname=os.uname().nodename + '.')
     arpa_zone_contents.append(default_soa_record)
 
 if not ns_record_found:
     default_ns_record = "arpa. 300 IN NS {hostname}".format(
-            hostname=os.uname().nodename)
+            hostname=os.uname().nodename + '.')
     arpa_zone_contents.append(default_ns_record)
 
 with open("/tmp/reverse.zone", "w+") as z:
