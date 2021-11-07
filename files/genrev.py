@@ -11,6 +11,7 @@ import sys
 import os
 import configparser
 import json
+import subprocess
 
 try:
     import dns.reversename
@@ -92,5 +93,6 @@ with open("/tmp/reverse.zone", "w+") as z:
         z.write(line + "\n")
 
 # TODO: investigate if this can be handled through the API
-os.system("/usr/bin/pdnsutil load-zone arpa /tmp/reverse.zone")
-os.remove("/tmp/reverse.zone")
+with open(os.devnull, 'wb') as devnull:
+    subprocess.check_call(["/usr/bin/pdnsutil", "load-zone", "arpa", "/tmp/reverse.zone"], stdout=devnull, stderr=subprocess.STDOUT)
+    os.remove("/tmp/reverse.zone")
