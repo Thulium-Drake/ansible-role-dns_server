@@ -54,7 +54,9 @@ for zone_dict in zones_json:
         if zone_dict['id'] == 'arpa.':
             if record['type'] == 'NS':
                 ns_record_found = True
-                ns_record_data = record['records'][0]['content']
+                ns_record_data = "arpa. {ttl} IN NS {value}".format(
+                        ttl=record['ttl'],
+                        value=record['records'][0]['content'])
                 arpa_zone_contents.append(ns_record_data)
             if record['type'] == 'SOA':
                 soa_record_found = True
