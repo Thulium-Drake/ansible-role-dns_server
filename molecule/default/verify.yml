@@ -15,7 +15,7 @@
         loop_var: 'service'
 
     - name: 'Check if test record exists'
-      shell: 'host ns.sub.example.com localhost | tail -n1'
+      shell: 'host some-host.sub.example.com localhost | tail -n1'
       register: 'r'
       check_mode: false
       changed_when: false
@@ -23,4 +23,4 @@
 
     - name: 'Check result'
       assert:
-        that: r.stdout == 'ns.sub.example.com has address 127.0.0.1'
+        that: r.stdout == 'some-host.sub.example.com has address 192.168.1.1'

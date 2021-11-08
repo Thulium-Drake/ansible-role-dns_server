@@ -10,13 +10,31 @@
     - name: 'Run role'
       include_role:
         name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
-    - name: 'Register test record'
-      nsupdate:
+
+    - name: 'Register NS record'
+      community.general.nsupdate:
         server: '127.0.0.1'
         port: 5300
         ttl: '60'
-        zone: "{{ zone }}"
-        record: "some-host"
+        zone: 'sub.example.com'
+        record: 'sub.example.com'
+        value: 'some-host.sub.example.com'
+        type: 'NS'
+        key_algorithm: "{{ dns_server_tsig_key_algo }}"
+        key_name: "{{ dns_server_tsig_key_name }}"
+        key_secret: "{{ dns_server_tsig_key_value }}"
+      register: 'dns_updated'
+      retries: 3
+      delay: 3
+      until: not dns_updated.failed
+
+    - name: 'Register A record'
+      community.general.nsupdate:
+        server: '127.0.0.1'
+        port: 5300
+        ttl: '60'
+        zone: 'sub.example.com'
+        record: 'some-host'
         value: '192.168.1.1'
         type: 'A'
         key_algorithm: "{{ dns_server_tsig_key_algo }}"
@@ -26,9 +44,3 @@
       retries: 3
       delay: 3
       until: not dns_updated.failed
-      loop:
-        - 'sub.example.com'
-        - '_msdcs.sub.example.com'
-        - 'other.example.com'
-      loop_control:
-        loop_var: 'zone'
