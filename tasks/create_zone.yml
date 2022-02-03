@@ -1,6 +1,6 @@
 ---
 - name: 'Check zone'
-  uri:
+  ansible.builtin.uri:
     url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones/{{ zone }}."
     method: 'GET'
     headers:
@@ -12,36 +12,36 @@
   register: 'zone_api_status'
 
 - block:
-  - name: 'Ensure master zone'
-    uri:
-      url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
-      method: 'POST'
-      body:
-        name: "{{ zone }}."
-        kind: 'master'
-        nameservers:
-          - "{{ dns_server_ns_name }}."
-      body_format: 'json'
-      headers:
-        X-API-Key: "{{ dns_server_api_key }}"
-      status_code: 201
-    changed_when: true
+    - name: 'Ensure master zone'
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
+        method: 'POST'
+        body:
+          name: "{{ zone }}."
+          kind: 'master'
+          nameservers:
+            - "{{ dns_server_ns_name }}."
+        body_format: 'json'
+        headers:
+          X-API-Key: "{{ dns_server_api_key }}"
+        status_code: 201
+      changed_when: true
 
-  - name: 'Render default empty zone'
-    template:
-      src: 'default_zone.j2'
-      dest: "/tmp/{{ zone }}.txt"
-      mode: 0600
+    - name: 'Render default empty zone'
+      ansible.builtin.template:
+        src: 'default_zone.j2'
+        dest: "/tmp/{{ zone }}.txt"
+        mode: 0600
 
-  - name: 'Import default empty zone'
-    shell: |
-      pdnsutil load-zone {{ zone }} /tmp/{{ zone }}.txt
+    - name: 'Import default empty zone'
+      ansible.builtin.shell: |
+        pdnsutil load-zone {{ zone }} /tmp/{{ zone }}.txt
   when:
-   - zone_api_status['status'] != 200
-   - dns_server_role == 'master'
+    - zone_api_status['status'] != 200
+    - dns_server_role == 'master'
 
 - name: 'Ensure slave zone'
-  uri:
+  ansible.builtin.uri:
     url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
     method: 'POST'
     body:
@@ -54,11 +54,12 @@
     status_code: 201
   changed_when: true
   when:
-   - zone_api_status['status'] != 200
-   - dns_server_role == 'slave'
+    - zone_api_status['status'] != 200
+    - dns_server_role == 'slave'
 
 - name: "Activate DNSUPDATE TSIG keys for {{ zone }}"
-  shell: |
+  ansible.builtin.shell: |
+    set -o pipefail
     result=1
     pdnsutil get-meta {{ zone }} TSIG-ALLOW-DNSUPDATE | grep {{ dns_server_tsig_key_name }}
     ret=$?
@@ -78,11 +79,12 @@
   failed_when: tsig_key_activate['rc'] == 1
   when:
     - dns_server_role == 'master'
-    - dns_server_tsig_key_name != ''
-    - dns_server_tsig_key_value != ''
+    - dns_server_tsig_key_name | length > 0
+    - dns_server_tsig_key_value | length > 0
 
 - name: "Activate TSIG keys for {{ zone }}"
-  shell: |
+  ansible.builtin.shell: |
+    set -o pipefail
     result=1
     pdnsutil get-meta {{ zone }} AXFR-MASTER-TSIG | grep {{ dns_server_tsig_key_name }}
     ret=$?
@@ -101,5 +103,5 @@
   failed_when: tsig_key_activate['rc'] == 1
   when:
     - dns_server_role == 'slave'
-    - dns_server_tsig_key_name != ''
-    - dns_server_tsig_key_value != ''
+    - dns_server_tsig_key_name | length > 0
+    - dns_server_tsig_key_value | length > 0

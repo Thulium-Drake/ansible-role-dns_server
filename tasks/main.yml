@@ -1,6 +1,6 @@
 ---
 - name: 'Include OS specific vars'
-  include_vars: "{{ lookup('first_found', dns_server_vars) }}"
+  ansible.builtin.include_vars: "{{ lookup('first_found', dns_server_vars) }}"
   vars:
     dns_server_vars:
       files:
@@ -11,7 +11,7 @@
   no_log: true
 
 - name: 'Install PowerDNS'
-  package:
+  ansible.builtin.package:
     name:
       - "{{ dns_server_pdns_auth_pkg }}"
       - "pdns-backend-{{ dns_server_backend }}"
@@ -21,14 +21,16 @@
     state: 'present'
 
 - name: 'Run SELinux tasks'
-  include_tasks: 'selinux.yml'
+  ansible.builtin.include_tasks: 'selinux.yml'
   when: ansible_facts['os_family'] == 'RedHat'
 
 - name: 'Set up automatic reverse zone generation'
-  when: dns_server_autogen_reverse_dns
+  when:
+    - dns_server_autogen_reverse_dns
+    - dns_server_role == 'master'
   block:
     - name: 'Ensure script to generate reverse zones'
-      copy:
+      ansible.builtin.copy:
         src: 'genrev.py'
         dest: '/usr/local/bin/pdns_genrev.py'
         mode: 0755
@@ -36,22 +38,23 @@
         group: 'root'
 
     - name: 'Schedule genrating reverse zones'
-      cron:
+      ansible.builtin.cron:
         name: 'Generate reverse DNS zones'
         special_time: 'hourly'
         job: '/usr/local/bin/pdns_genrev.py'
         user: 'root'
 
 - name: 'Install PowerDNS'
-  package:
+  ansible.builtin.cron:
     name:
       - 'pdns-recursor'
   when: dns_recursor_enabled
 
 - name: 'Ensure conf dirs'
-  file:
+  ansible.builtin.file:
     path: "{{ dir }}"
     state: 'directory'
+    mode: 0750
     owner: 'pdns'
     group: 'pdns'
   loop:
@@ -61,7 +64,7 @@
     loop_var: 'dir'
 
 - name: 'Ensure base config'
-  copy:
+  ansible.builtin.copy:
     dest: "{{ dns_server_basedir }}/pdns.conf"
     content: |
       # This file is managed with Ansible, your changes will be lost!
@@ -69,13 +72,14 @@
       setuid=pdns
       include-dir={{ dns_server_basedir }}/pdns.d
       launch=
+    mode: 0644
     owner: 'pdns'
     group: 'pdns'
   notify:
     - 'restart pdns'
 
 - name: 'Remove default BIND config from package'
-  file:
+  ansible.builtin.file:
     path: "{{ dns_server_basedir }}/pdns.d/bind.conf"
     state: 'absent'
   notify:
@@ -84,23 +88,24 @@
 - name: 'Configure SQLite backend'
   block:
     - name: 'Install dependencies'
-      package:
+      ansible.builtin.package:
         name: "{{ dns_server_sqlite_pkg }}"
         state: 'present'
     - name: 'Place config'
-      copy:
+      ansible.builtin.copy:
         src: 'pdns_sqlite.conf'
         dest: "{{ dns_server_basedir }}/pdns.d/sqlite.conf"
+        mode: 0644
         owner: 'pdns'
         group: 'pdns'
       notify:
         - 'restart pdns'
 
     - name: 'Collect package version'
-      package_facts:
+      ansible.builtin.package_facts:
 
     - name: 'Setup SQLite database file'
-      shell: |
+      ansible.builtin.shell: |
         /usr/bin/sqlite3 \
         /var/lib/powerdns/pdns.sqlite3 < {{ dns_server_sqlite_schema }}
         chown -R pdns:pdns /var/lib/powerdns
@@ -108,16 +113,17 @@
         creates: '/var/lib/powerdns/pdns.sqlite3'
 
     - name: 'Ensure SELinux file context'
-      command: restorecon -rv /var/lib/powerdns
+      ansible.builtin.command: restorecon -rv /var/lib/powerdns
       when: ansible_facts['os_family'] == 'RedHat'
   when: dns_server_backend == 'sqlite3' or dns_server_backend == 'sqlite'
 
 - name: 'Configure Mariadb backend'
   block:
     - name: 'Place config'
-      template:
+      ansible.builtin.template:
         src: 'pdns_mysql.conf.j2'
         dest: "{{ dns_server_basedir }}/pdns.d/mysql.conf"
+        mode: 0644
         owner: 'pdns'
         group: 'pdns'
       notify:
@@ -125,18 +131,20 @@
   when: dns_server_backend == 'mysql'
 
 - name: 'Ensure API settings'
-  template:
+  ansible.builtin.template:
     src: 'ansible_pdns.conf.j2'
     dest: "{{ dns_server_basedir }}/pdns.d/ansible_pdns.conf"
+    mode: 0644
     owner: 'pdns'
     group: 'pdns'
   notify:
     - 'restart pdns'
 
 - name: 'Ensure recursor settings'
-  template:
+  ansible.builtin.template:
     src: 'recursor.conf.j2'
     dest: "{{ dns_server_basedir }}/recursor.conf"
+    mode: 0644
     owner: 'pdns'
     group: 'pdns'
   notify:
@@ -144,13 +152,13 @@
   when: dns_recursor_enabled
 
 - name: 'Enable Authoratative server'
-  service:
+  ansible.builtin.service:
     name: 'pdns'
     state: 'started'
     enabled: true
 
 - name: 'Enable Recursive server'
-  service:
+  ansible.builtin.service:
     name: 'pdns-recursor'
     state: 'started'
     enabled: true
@@ -164,10 +172,12 @@
     state: 'enabled'
   when: ansible_facts['os_family'] == 'RedHat'
 
-- meta: 'flush_handlers'
+- name: 'Flush handlers'
+  ansible.builtin.meta: 'flush_handlers'
 
 - name: 'Import TSIG keys'
-  shell: |
+  ansible.builtin.shell: |
+    set +o pipefail
     result=1
     pdnsutil list-tsig-keys | grep '{{ dns_server_tsig_key_name }}. {{ dns_server_tsig_key_algo }}. {{ dns_server_tsig_key_value }}'
     ret=$?
@@ -185,11 +195,11 @@
   changed_when: tsig_key_import['rc'] == 2
   failed_when: tsig_key_import['rc'] == 1
   when:
-    - dns_server_tsig_key_name != ''
-    - dns_server_tsig_key_value != ''
+    - dns_server_tsig_key_name | length > 0
+    - dns_server_tsig_key_value | length > 0
 
 - name: 'Create zones'
-  include_tasks: 'create_zone.yml'
+  ansible.builtin.include_tasks: 'create_zone.yml'
   loop: "{{ dns_server_zones }}"
   loop_control:
     loop_var: 'zone'

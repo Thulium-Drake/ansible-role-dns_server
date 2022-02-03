@@ -1,17 +1,20 @@
 ---
 - name: 'Ensure SELinux tools'
-  package:
+  ansible.builtin.package:
     name: "{{ dns_server_selinux_tools_pkg }}"
     state: 'present'
 
 - name: 'Ensure PDNS type enforcement template'
-  copy:
+  ansible.builtin.copy:
     src: 'pdns-ansible.te'
     dest: '/etc/selinux/pdns-ansible.te'
+    mode: 0644
+    owner: 'root'
+    group: 'root'
   register: 'selinux_policy_changed'
 
 - name: 'Compile and load SELinux policy module'
-  shell: |
+  ansible.builtin.shell: |
     checkmodule -M -m -o /etc/selinux/pdns-ansible.mod /etc/selinux/pdns-ansible.te
     semodule_package -o /etc/selinux/pdns-ansible.pp -m /etc/selinux/pdns-ansible.mod
     semodule -i /etc/selinux/pdns-ansible.pp
