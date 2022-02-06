@@ -45,7 +45,7 @@
         user: 'root'
 
 - name: 'Install PowerDNS'
-  ansible.builtin.cron:
+  ansible.builtin.package:
     name:
       - 'pdns-recursor'
   when: dns_recursor_enabled
