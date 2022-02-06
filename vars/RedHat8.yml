@@ -5,5 +5,5 @@ dns_server_nsupdate_pkg: 'bind-utils'
 dns_server_python_dns_pkg: 'python3-dns'
 dns_server_python_requests_pkg: 'python3-requests'
 dns_server_sqlite_pkg: 'sqlite'
-dns_server_sqlite_schema: "/usr/share/doc/pdns/schema.sqlite3.sql"
+dns_server_sqlite_schema: "/usr/share/doc/pdns-backend-sqlite/schema.sqlite3.sql"
 dns_server_selinux_tools_pkg: 'policycoreutils-python3'
