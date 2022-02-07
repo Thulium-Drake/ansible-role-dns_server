@@ -1,10 +1,10 @@
 # {{ ansible_managed }}
-config-dir=/etc/powerdns
+config-dir={{ dns_recursor_conf_dir }}
 hint-file=/usr/share/dns/root.hints
 local-address={{ dns_recursor_address }}
 forward-zones={% for zone in dns_server_zones %}{{ zone }}={{ dns_server_address}}:{{ dns_server_port }}{{ "," if not loop.last else "" }}{% endfor %}
 
 quiet=yes
 security-poll-suffix=
-setgid=pdns
-setuid=pdns
+setgid={{ dns_recursor_uid }}
+setuid={{ dns_recursor_uid }}

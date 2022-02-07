@@ -143,10 +143,10 @@
 - name: 'Ensure recursor settings'
   ansible.builtin.template:
     src: 'recursor.conf.j2'
-    dest: "{{ dns_server_basedir }}/recursor.conf"
+    dest: "{{ dns_recursor_conf_dir }}/recursor.conf"
     mode: 0644
-    owner: 'pdns'
-    group: 'pdns'
+    owner: "{{ dns_recursor_uid }}"
+    group: "{{ dns_recursor_uid }}"
   notify:
     - 'restart pdns-recursor'
   when: dns_recursor_enabled
