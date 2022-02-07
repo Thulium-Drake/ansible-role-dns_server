@@ -27,6 +27,13 @@
     setype: 'pdns_conf_t'
     state: 'present'
 
+- name: 'Allow to bind to server port'
+  community.general.seport:
+    ports: "{{ dns_server_port }}"
+    proto: 'udp'
+    setype: 'dns_port_t'
+    state: 'present'
+
 - name: 'Allow to bind to udp high ports'
   community.general.seport:
     ports: '10000-20000'
