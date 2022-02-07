@@ -30,9 +30,14 @@
 - name: 'Allow to bind to server port'
   community.general.seport:
     ports: "{{ dns_server_port }}"
-    proto: 'udp'
+    proto: "{{ proto }}"
     setype: 'dns_port_t'
     state: 'present'
+  loop:
+    - 'tcp'
+    - 'udp'
+  loop_control:
+    loop_var: 'proto'
 
 - name: 'Allow to bind to udp high ports'
   community.general.seport:
