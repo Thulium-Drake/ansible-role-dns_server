@@ -26,7 +26,7 @@ allow-notify-from={% for ip in dns_server_masters %}{{ ip }}{{ ", " if not loop.
 
 # DNS update is used to register/update systems
 dnsupdate=yes
-allow-dnsupdate-from=127.0.0.0/8, {{ dns_server_address }} {% for ip in dns_server_nsupdate_ips %}, {{ ip }}{% endfor %}
+allow-dnsupdate-from=127.0.0.0/8 {% for ip in dns_server_nsupdate_ips %}, {{ ip }}{% endfor %}
 
 # Defaults
 default-ttl={{ dns_server_default_ttl }}
