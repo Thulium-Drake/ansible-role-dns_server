@@ -114,7 +114,9 @@
 
     - name: 'Ensure SELinux file context'
       ansible.builtin.command: restorecon -rv /var/lib/powerdns
+      register: 'dns_server_restorecon'
       when: ansible_facts['os_family'] == 'RedHat'
+      changed_when: dns_server_restorecon['stdout'] | length > 0
   when: dns_server_backend == 'sqlite3' or dns_server_backend == 'sqlite'
 
 - name: 'Configure Mariadb backend'
