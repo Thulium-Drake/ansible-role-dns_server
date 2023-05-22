@@ -4,18 +4,10 @@
 This role will provide a means to install, configure and update a local DNS
 server with information for systems in the network.
 
-It can also configure a recursor on the same machine. By default, this looks like:
-
-* PDNS-recursor : port 53 on 0.0.0.0
-* PDNS-server   : port 5300 on 127.0.0.1
-
 Check the defaults if you want to make changes.
 
 This role uses PowerDNS as the server and can be used for deployment of
 Active Directory.
-
-The only supported OS for this role (for now) is Debian, as I did not have
-an environment with CentOS/RHEL on hand when developing this.
 
 # Registering records
 Manipulating the contents of the created zone can be done using Ansible's

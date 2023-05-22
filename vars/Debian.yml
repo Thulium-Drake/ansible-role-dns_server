@@ -1,7 +1,5 @@
 ---
 dns_server_basedir: '/etc/powerdns'
-dns_recursor_conf_dir: '/etc/powerdns'
-dns_recursor_uid: 'pdns'
 dns_server_pdns_auth_pkg: 'pdns-server'
 dns_server_nsupdate_pkg: 'dnsutils'
 dns_server_python_dns_pkg: 'python3-dnspython'

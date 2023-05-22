@@ -23,8 +23,8 @@ dns_server_zones:
   - 'other.example.com'
 
 # Port and listen address for the Authoritative server
-dns_server_address: '127.0.0.1'
-dns_server_port: 5300
+dns_server_address: '0.0.0.0'
+dns_server_port: 53
 
 # If set to true, will provision infra to automatically generate reverse DNS
 # for all forward zones present on this server
@@ -49,9 +49,3 @@ dns_server_slaves: []
 
 # If the node is a slave, add a list of master IPs here
 dns_server_masters: []
-
-# Disable the recursor if desired, check the port and listen address above!
-dns_recursor_enabled: true
-
-# Listen address for the Recursor
-dns_recursor_address: '0.0.0.0'

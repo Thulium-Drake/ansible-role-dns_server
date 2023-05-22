@@ -1,10 +1,5 @@
 ---
-- name: 'restart pdns'
+- name: 'Restart pdns'
   service:
     name: 'pdns'
-    state: 'restarted'
-
-- name: 'restart pdns-recursor'
-  service:
-    name: 'pdns-recursor'
     state: 'restarted'

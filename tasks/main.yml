@@ -44,12 +44,6 @@
         job: '/usr/local/bin/pdns_genrev.py'
         user: 'root'
 
-- name: 'Install PowerDNS'
-  ansible.builtin.package:
-    name:
-      - 'pdns-recursor'
-  when: dns_recursor_enabled
-
 - name: 'Ensure conf dirs'
   ansible.builtin.file:
     path: "{{ dir }}"
@@ -76,14 +70,14 @@
     owner: 'pdns'
     group: 'pdns'
   notify:
-    - 'restart pdns'
+    - 'Restart pdns'
 
 - name: 'Remove default BIND config from package'
   ansible.builtin.file:
     path: "{{ dns_server_basedir }}/pdns.d/bind.conf"
     state: 'absent'
   notify:
-    - 'restart pdns'
+    - 'Restart pdns'
 
 - name: 'Configure SQLite backend'
   block:
@@ -99,7 +93,7 @@
         owner: 'pdns'
         group: 'pdns'
       notify:
-        - 'restart pdns'
+        - 'Restart pdns'
 
     - name: 'Collect package version'
       ansible.builtin.package_facts:
@@ -129,7 +123,7 @@
         owner: 'pdns'
         group: 'pdns'
       notify:
-        - 'restart pdns'
+        - 'Restart pdns'
   when: dns_server_backend == 'mysql'
 
 - name: 'Ensure API settings'
@@ -140,31 +134,13 @@
     owner: 'pdns'
     group: 'pdns'
   notify:
-    - 'restart pdns'
-
-- name: 'Ensure recursor settings'
-  ansible.builtin.template:
-    src: 'recursor.conf.j2'
-    dest: "{{ dns_recursor_conf_dir }}/recursor.conf"
-    mode: 0644
-    owner: "{{ dns_recursor_uid }}"
-    group: "{{ dns_recursor_uid }}"
-  notify:
-    - 'restart pdns-recursor'
-  when: dns_recursor_enabled
+    - 'Restart pdns'
 
 - name: 'Enable Authoratative server'
   ansible.builtin.service:
     name: 'pdns'
     state: 'started'
     enabled: true
-
-- name: 'Enable Recursive server'
-  ansible.builtin.service:
-    name: 'pdns-recursor'
-    state: 'started'
-    enabled: true
-  when: dns_recursor_enabled
 
 - name: 'Configure firewalld'
   ansible.posix.firewalld:
