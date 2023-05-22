@@ -5,28 +5,28 @@
     ansible_python_interpreter: '/usr/bin/python3'
   tasks:
     - name: 'Ensure cron and gnupg2'
-      apt:
+      ansible.builtin.apt:
         name:
           - 'gnupg2'
           - 'cron'
         state: 'present'
         update_cache: true
     - name: 'Get APT GPG key to /tmp'
-      uri:
+      ansible.builtin.uri:
         url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x9faaa5577e8fcf62093d036c1b0c6205fd380fbb'
         return_content: true
         dest: '/tmp/apt-pdns.gpg'
     - name: 'Add APT key to keyring'
-      apt_key:
+      ansible.builtin.apt_key:
         file: '/tmp/apt-pdns.gpg'
         state: 'present'
     - name: 'Add PowerDNS repo'
-      copy:
+      ansible.builtin.copy:
         dest: '/etc/apt/sources.list.d/pdns.list'
         mode: 0644
         content: |
           deb http://repo.powerdns.com/debian {{ ansible_facts['distribution_release'] }}-rec-46 main
           deb http://repo.powerdns.com/debian {{ ansible_facts['distribution_release'] }}-auth-45 main
     - name: 'Update APT cache'
-      apt:
+      ansible.builtin.apt:
         update_cache: true

@@ -2,14 +2,16 @@
 galaxy_info:
   author: 'thulium_drake'
   description: 'Setup a local autoratative DNS server'
-  company:
   role_name: 'dns_server'
 
   license: 'GPLv3'
 
-  min_ansible_version: 2.8
+  min_ansible_version: '2.10'
 
   platforms:
+    - name: 'EL'
+      versions:
+        - '8'
     - name: 'Debian'
       versions:
         - 'bullseye'

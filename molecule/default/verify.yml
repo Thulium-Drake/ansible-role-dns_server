@@ -5,7 +5,7 @@
   gather_facts: false
   tasks:
     - name: 'Check if pdns is running'
-      service:
+      ansible.builtin.service:
         name: "{{ service }}"
         state: 'started'
       loop:
@@ -14,12 +14,14 @@
         loop_var: 'service'
 
     - name: 'Check if test record exists'
-      shell: 'host some-host.sub.example.com localhost | tail -n1'
+      ansible.builtin.shell: |
+        set -o pipefail
+        host some-host.sub.example.com localhost | tail -n1
       register: 'r'
       check_mode: false
       changed_when: false
       delegate_to: 'molecule-dns'
 
     - name: 'Check result'
-      assert:
+      ansible.builtin.assert:
         that: r.stdout == 'some-host.sub.example.com has address 192.168.1.1'

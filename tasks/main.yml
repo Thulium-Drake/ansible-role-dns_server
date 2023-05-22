@@ -80,6 +80,7 @@
     - 'Restart pdns'
 
 - name: 'Configure SQLite backend'
+  when: dns_server_backend == 'sqlite3' or dns_server_backend == 'sqlite'
   block:
     - name: 'Install dependencies'
       ansible.builtin.package:
@@ -111,9 +112,9 @@
       register: 'dns_server_restorecon'
       when: ansible_facts['os_family'] == 'RedHat'
       changed_when: dns_server_restorecon['stdout'] | length > 0
-  when: dns_server_backend == 'sqlite3' or dns_server_backend == 'sqlite'
 
 - name: 'Configure Mariadb backend'
+  when: dns_server_backend == 'mysql'
   block:
     - name: 'Place config'
       ansible.builtin.template:
@@ -124,7 +125,6 @@
         group: 'pdns'
       notify:
         - 'Restart pdns'
-  when: dns_server_backend == 'mysql'
 
 - name: 'Ensure API settings'
   ansible.builtin.template:

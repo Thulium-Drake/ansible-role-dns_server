@@ -11,7 +11,11 @@
       - 422
   register: 'zone_api_status'
 
-- block:
+- name: 'Ensure master zones'
+  when:
+    - zone_api_status['status'] != 200
+    - dns_server_role == 'master'
+  block:
     - name: 'Ensure master zone'
       ansible.builtin.uri:
         url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
@@ -34,11 +38,9 @@
         mode: 0600
 
     - name: 'Import default empty zone'
-      ansible.builtin.shell: |
+      ansible.builtin.command: |
         pdnsutil load-zone {{ zone }} /tmp/{{ zone }}.txt
-  when:
-    - zone_api_status['status'] != 200
-    - dns_server_role == 'master'
+      changed_when: true
 
 - name: 'Ensure slave zone'
   ansible.builtin.uri:
