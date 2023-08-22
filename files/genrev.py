@@ -26,14 +26,29 @@ except ImportError:
     print('ERROR: requires requests!')
     sys.exit(1)
 
+conf_found = False
+
 try:
     with open("/etc/powerdns/pdns.d/ansible_pdns.conf", "r") as f:
         config_string = '[pdns]\n' + f.read()
-    config = configparser.ConfigParser()
-    config.read_string(config_string)
+        conf_found = True
 except (FileNotFoundError, IOError):
+    conf_found = False
+
+if not conf_found:
+    try:
+        with open("/etc/pdns/pdns.d/ansible_pdns.conf", "r") as f:
+            config_string = '[pdns]\n' + f.read()
+            conf_found = True
+    except (FileNotFoundError, IOError):
+        conf_found = False
+
+if not conf_found:
     print('ERROR: PowerDNS config not found, please run Ansible role again')
     sys.exit(1)
+
+config = configparser.ConfigParser()
+config.read_string(config_string)
 
 api_auth_header = {'X-API-KEY': config['pdns']['api-key']}
 api_baseurl = 'http://' + config['pdns']['webserver-address'] + ':' + config['pdns']['webserver-port'] + '/api/v1/servers/localhost/'
