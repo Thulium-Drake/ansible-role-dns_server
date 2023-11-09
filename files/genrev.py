@@ -90,6 +90,9 @@ for zone_dict in zones_json:
         else:
             if record['type'] == 'A' or record['type'] == 'AAAA':
                 ptr_host = record['name']
+                if ptr_host.startswith('ipa-ca'):
+                    # Skip processing for records named ipa-ca, as this breaks FreeIPA domains
+                    continue
                 ptr_ip = record['records'][0]['content']
                 ptr_record = dns.reversename.from_address(ptr_ip)
                 arpa_zone_contents.append(str(ptr_record) + ' 300 IN PTR ' + ptr_host)
