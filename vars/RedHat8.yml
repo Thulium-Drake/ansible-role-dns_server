@@ -2,8 +2,8 @@
 dns_server_basedir: '/etc/pdns'
 dns_server_pdns_auth_pkg: 'pdns'
 dns_server_nsupdate_pkg: 'bind-utils'
-dns_server_python_dns_pkg: 'python3-dns'
-dns_server_python_requests_pkg: 'python3-requests'
+dns_server_python_dns_pkg: 'python39-dns'
+dns_server_python_requests_pkg: 'python39-requests'
 dns_server_sqlite_pkg: 'sqlite'
 dns_server_sqlite_schema: "/usr/share/doc/pdns-backend-sqlite/schema.sqlite3.sql"
-dns_server_selinux_tools_pkg: 'policycoreutils-python3'
+dns_server_selinux_tools_pkg: 'python3-policycoreutils'
