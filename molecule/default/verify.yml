@@ -14,9 +14,8 @@
         loop_var: 'service'
 
     - name: 'Check if test record exists'
-      ansible.builtin.shell: |
-        set -o pipefail
-        host some-host.sub.example.com localhost | tail -n1
+      ansible.builtin.command: |
+        dig +short some-host.sub.example.com @127.0.0.1
       register: 'r'
       check_mode: false
       changed_when: false
@@ -24,4 +23,4 @@
 
     - name: 'Check result'
       ansible.builtin.assert:
-        that: r.stdout == 'some-host.sub.example.com has address 192.168.1.1'
+        that: r.stdout == '192.168.1.1'

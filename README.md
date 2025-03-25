@@ -1,12 +1,10 @@
-[![Build Status](https://drone.element-networks.nl/api/badges/Element-Networks/ansible-role-dns_server/status.svg)](https://drone.element-networks.nl/Element-Networks/ansible-role-dns_server)
-
 # Ansible role to configure an authoratative nameserver for local domains
 This role will provide a means to install, configure and update a local DNS
 server with information for systems in the network.
 
 Check the defaults if you want to make changes.
 
-This role uses PowerDNS as the server and can be used for deployment of
+This role uses PowerDNS 4.9+ as the server and can be used for deployment of
 Active Directory.
 
 # Registering records

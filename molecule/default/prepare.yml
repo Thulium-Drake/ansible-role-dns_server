@@ -25,7 +25,7 @@
         dest: '/etc/apt/sources.list.d/pdns.list'
         mode: 0644
         content: |
-          deb http://repo.powerdns.com/debian {{ ansible_facts['distribution_release'] }}-auth-48 main
+          deb http://repo.powerdns.com/debian {{ ansible_facts['distribution_release'] }}-auth-49 main
     - name: 'Update APT cache'
       ansible.builtin.apt:
         update_cache: true

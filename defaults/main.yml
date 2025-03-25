@@ -42,10 +42,10 @@ dns_server_tsig_key_value: ''
 dns_server_tsig_key_algo: 'hmac-sha256'
 
 # Node role and relatives
-dns_server_role: 'master'
+dns_server_role: 'primary'
 
-# If the node is a master, add a list of slave IPs here
-dns_server_slaves: []
+# If the node is a primary, add a list of secondary IPs here
+dns_server_secondaries: []
 
-# If the node is a slave, add a list of master IPs here
-dns_server_masters: []
+# If the node is a secondary, add a list of primary IPs here
+dns_server_primaries: []

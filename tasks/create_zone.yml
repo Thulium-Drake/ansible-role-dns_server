@@ -11,12 +11,12 @@
       - 422
   register: 'zone_api_status'
 
-- name: 'Ensure master zones'
+- name: 'Ensure primary zones'
   when:
     - zone_api_status['status'] != 200
-    - dns_server_role == 'master'
+    - dns_server_role == 'primary'
   block:
-    - name: 'Ensure master zone'
+    - name: 'Ensure primary zone'
       ansible.builtin.uri:
         url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
         method: 'POST'
@@ -42,14 +42,14 @@
         pdnsutil load-zone {{ zone }} /tmp/{{ zone }}.txt
       changed_when: true
 
-- name: 'Ensure slave zone'
+- name: 'Ensure secondary zone'
   ansible.builtin.uri:
     url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
     method: 'POST'
     body:
       name: "{{ zone }}."
       kind: 'slave'
-      masters: "{{ dns_server_masters }}"
+      masters: "{{ dns_server_primaries }}"
     body_format: 'json'
     headers:
       X-API-Key: "{{ dns_server_api_key }}"
@@ -80,7 +80,7 @@
   changed_when: tsig_key_activate['rc'] == 2
   failed_when: tsig_key_activate['rc'] == 1
   when:
-    - dns_server_role == 'master'
+    - dns_server_role == 'primary'
     - dns_server_tsig_key_name | length > 0
     - dns_server_tsig_key_value | length > 0
 

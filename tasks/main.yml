@@ -27,7 +27,7 @@
 - name: 'Set up automatic reverse zone generation'
   when:
     - dns_server_autogen_reverse_dns
-    - dns_server_role == 'master'
+    - dns_server_role == 'primary'
   block:
     - name: 'Ensure script to generate reverse zones'
       ansible.builtin.copy:

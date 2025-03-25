@@ -12,14 +12,14 @@ local-port={{ dns_server_port }}
 
 # Node role and settings
 {{ dns_server_role }}=yes
-{% if dns_server_role == 'master' -%}
+{% if dns_server_role == 'primary' -%}
 # Allow transfer to slaves and notify them
 allow-axfr-ips={% for ip in dns_server_slaves %}{{ ip }}{{ ", " if not loop.last else "" }}{% endfor %}
 
 also-notify={% for ip in dns_server_slaves %}{{ ip }}{{ ", " if not loop.last else "" }}{% endfor %}
 {% endif -%}
 
-{% if dns_server_role == 'slave' -%}
+{% if dns_server_role == 'secondary' -%}
 # Allow notifications from master
 allow-notify-from={% for ip in dns_server_masters %}{{ ip }}{{ ", " if not loop.last else "" }}{% endfor %}
 {%- endif %}
