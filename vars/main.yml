@@ -2,7 +2,3 @@
 supported_backends:
   - 'mysql'
   - 'sqlite3'
-
-# Map legacy variables to new ones
-dns_server_secondaries: "{{ dns_server_slaves }}"
-dns_server_primaries: "{{ dns_server_masters }}"
