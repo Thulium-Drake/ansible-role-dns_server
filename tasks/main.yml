@@ -37,7 +37,7 @@
         owner: 'root'
         group: 'root'
 
-    - name: 'Schedule genrating reverse zones'
+    - name: 'Schedule generating reverse zones'
       ansible.builtin.cron:
         name: 'Generate reverse DNS zones'
         special_time: 'hourly'
