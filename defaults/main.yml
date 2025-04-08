@@ -12,6 +12,7 @@ dns_server_db_password: 'secret'
 
 # Key used by Ansible to communicate with PowerDNS' API
 dns_server_api_key: 'very_secure_random_password_which_is_also_very_long'
+dns_server_api_port: 8081
 
 # Default TTL for records
 dns_server_default_ttl: 300
