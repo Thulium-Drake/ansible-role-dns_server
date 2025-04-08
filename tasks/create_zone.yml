@@ -1,7 +1,7 @@
 ---
 - name: 'Check zone'
   ansible.builtin.uri:
-    url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones/{{ zone }}."
+    url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/zones/{{ zone }}."
     method: 'GET'
     headers:
       X-API-Key: "{{ dns_server_api_key }}"
@@ -18,7 +18,7 @@
   block:
     - name: 'Ensure primary zone'
       ansible.builtin.uri:
-        url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
+        url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/zones"
         method: 'POST'
         body:
           name: "{{ zone }}."
@@ -44,7 +44,7 @@
 
 - name: 'Ensure secondary zone'
   ansible.builtin.uri:
-    url: "http://127.0.0.1:8081/api/v1/servers/localhost/zones"
+    url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/zones"
     method: 'POST'
     body:
       name: "{{ zone }}."
@@ -57,7 +57,7 @@
   changed_when: true
   when:
     - zone_api_status['status'] != 200
-    - dns_server_role == 'slave'
+    - dns_server_role == 'secondary'
 
 - name: "Activate DNSUPDATE TSIG keys for {{ zone }}"
   ansible.builtin.shell: |
@@ -104,6 +104,6 @@
   changed_when: tsig_key_activate['rc'] == 2
   failed_when: tsig_key_activate['rc'] == 1
   when:
-    - dns_server_role == 'slave'
+    - dns_server_role == 'secondary'
     - dns_server_tsig_key_name | length > 0
     - dns_server_tsig_key_value | length > 0
