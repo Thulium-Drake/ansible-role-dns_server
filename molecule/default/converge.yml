@@ -2,10 +2,10 @@
 - name: Converge
   hosts: all
   vars:
-    ansible_python_interpreter: '/usr/bin/python3'
     dns_server_tsig_key_name: 'rndc-key'
     dns_server_tsig_key_value: 'FcE9ugD2zkWy/r5xkLIFZQ=='
     dns_server_tsig_key_algo: 'hmac-md5'
+    _dns_server_molecule: true
   tasks:
     - name: 'Run role'
       ansible.builtin.include_role:

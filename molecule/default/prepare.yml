@@ -4,28 +4,52 @@
   vars:
     ansible_python_interpreter: '/usr/bin/python3'
   tasks:
-    - name: 'Ensure cron and gnupg2'
-      ansible.builtin.apt:
-        name:
-          - 'gnupg2'
-          - 'cron'
-        state: 'present'
-        update_cache: true
-    - name: 'Get APT GPG key to /tmp'
-      ansible.builtin.uri:
-        url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x9faaa5577e8fcf62093d036c1b0c6205fd380fbb'
-        return_content: true
-        dest: '/tmp/apt-pdns.gpg'
-    - name: 'Add APT key to keyring'
-      ansible.builtin.apt_key:
-        file: '/tmp/apt-pdns.gpg'
-        state: 'present'
-    - name: 'Add PowerDNS repo'
-      ansible.builtin.copy:
-        dest: '/etc/apt/sources.list.d/pdns.list'
-        mode: 0644
-        content: |
-          deb http://repo.powerdns.com/debian {{ ansible_facts['distribution_release'] }}-auth-49 main
-    - name: 'Update APT cache'
-      ansible.builtin.apt:
-        update_cache: true
+    - name: 'Run prepare tasks on RHEL'
+      when: ansible_facts['os_family'] == 'RedHat'
+      block:
+        - name: 'Ensure EPEL'
+          ansible.builtin.package:
+            name: 'epel-release'
+            state: 'present'
+
+        - name: 'Configure PowerDNS repo'
+          ansible.builtin.yum_repository:
+            name: 'pdns'
+            description: 'PowerDNS'
+            baseurl: 'http://repo.powerdns.com/el/$basearch/$releasever/auth-50'
+            gpgkey: 'https://repo.powerdns.com/FD380FBB-pub.asc'
+            state: 'present'
+
+    - name: 'Run prepare tasks on Debian'
+      when: ansible_facts['os_family'] == 'Debian'
+      block:
+        - name: 'Ensure cron and gnupg2'
+          ansible.builtin.package:
+            name:
+              - 'gnupg2'
+              - 'cron'
+            state: 'present'
+            update_cache: true
+
+        - name: 'Get APT GPG key'
+          ansible.builtin.get_url:
+            url: 'https://repo.powerdns.com/FD380FBB-pub.asc'
+            dest: '/etc/apt/keyrings/auth-50-pub.asc'
+            owner: 'root'
+            group: 'root'
+            mode: '0644'
+
+        - name: 'Add PowerDNS repo'
+          ansible.builtin.copy:
+            dest: '/etc/apt/sources.list.d/pdns.sources'
+            mode: 0644
+            content: |
+               Types: deb
+               URIs: http://repo.powerdns.com/debian
+               Suites: {{ ansible_facts['distribution_release'] }}-auth-50
+               Components: main
+               Signed-By: /etc/apt/keyrings/auth-50-pub.asc
+
+        - name: 'Update APT cache'
+          ansible.builtin.apt:
+            update_cache: true

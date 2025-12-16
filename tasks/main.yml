@@ -22,7 +22,9 @@
 
 - name: 'Run SELinux tasks'
   ansible.builtin.include_tasks: 'selinux.yml'
-  when: ansible_facts['os_family'] == 'RedHat'
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - not _dns_server_molecule | default(false) | bool
 
 - name: 'Set up automatic reverse zone generation'
   when:
@@ -78,6 +80,19 @@
     state: 'absent'
   notify:
     - 'Restart pdns'
+
+- name: 'Configure LMDB backend'
+  when: dns_server_backend == 'lmdb'
+  block:
+    - name: 'Place config'
+      ansible.builtin.copy:
+        src: 'pdns_lmdb.conf'
+        dest: "{{ dns_server_basedir }}/pdns.d/lmdb.conf"
+        mode: 0644
+        owner: 'pdns'
+        group: 'pdns'
+      notify:
+        - 'Restart pdns'
 
 - name: 'Configure SQLite backend'
   when: dns_server_backend == 'sqlite3' or dns_server_backend == 'sqlite'
