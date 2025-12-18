@@ -10,6 +10,9 @@ webserver-address=127.0.0.1
 local-address={{ dns_server_address }}
 local-port={{ dns_server_port }}
 
+# DNS Views
+views={{ dns_server_views | ternary('yes', 'no') }}
+
 # Node role and settings
 {{ dns_server_role }}=yes
 {% if dns_server_role == 'primary' -%}

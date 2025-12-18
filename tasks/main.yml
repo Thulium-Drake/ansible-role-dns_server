@@ -10,6 +10,12 @@
         - 'vars'
   no_log: true
 
+- name: 'Validate input'
+  ansible.builtin.assert:
+    that:
+      - dns_server_backend in dns_server_supported_backends
+      - not dns_server_views or dns_server_backend in dns_server_supported_backend_views
+
 - name: 'Install PowerDNS'
   ansible.builtin.package:
     name:
@@ -167,6 +173,52 @@
 
 - name: 'Flush handlers'
   ansible.builtin.meta: 'flush_handlers'
+
+- name: 'Configure view networks'
+  ansible.builtin.shell: |
+    set +o pipefail
+    result=1
+    pdnsutil network list | grep {{ dns_server_network_view['cidr'] }}
+    ret=$?
+    if [ $ret -eq 1 ]
+    then
+      pdnsutil {{ dns_server_network_view['cidr'] }} {{ dns_server_network_view['view'] }}
+      result=2
+    else
+      result=0
+    fi
+    exit $result
+  args:
+    executable: '/bin/bash'
+  register: 'view_network_config'
+  loop: "{{ dns_server_network_views }}"
+  loop_control:
+    loop_var: 'dns_server_network_view'
+  changed_when: view_network_config['rc'] == 2
+  failed_when: view_network_config['rc'] == 1
+
+- name: 'Configure zone views'
+  ansible.builtin.shell: |
+    set +o pipefail
+    result=1
+    pdnsutil view list {{ dns_server_zone_view['view'] }} | grep {{ dns_server_zone_view['zone'] }}
+    ret=$?
+    if [ $ret -eq 1 ]
+    then
+      pdnsutil view add-zone {{ dns_server_zone_view['view'] }} {{ dns_server_zone_view['zone'] }}..{{ dns_server_zone_view['view'] }}
+      result=2
+    else
+      result=0
+    fi
+    exit $result
+  args:
+    executable: '/bin/bash'
+  register: 'view_zone_config'
+  loop: "{{ dns_server_zone_views }}"
+  loop_control:
+    loop_var: 'dns_server_zone_view'
+  changed_when: view_zone_config['rc'] == 2
+  failed_when: view_zone_config['rc'] == 1
 
 - name: 'Import TSIG keys'
   ansible.builtin.shell: |

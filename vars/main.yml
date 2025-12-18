@@ -1,5 +1,8 @@
 ---
-supported_backends:
+dns_server_supported_backends:
   - 'lmdb'
   - 'mysql'
   - 'sqlite3'
+
+dns_server_supported_backend_views:
+  - 'lmdb'
