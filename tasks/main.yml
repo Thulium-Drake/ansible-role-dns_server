@@ -174,71 +174,20 @@
 - name: 'Flush handlers'
   ansible.builtin.meta: 'flush_handlers'
 
-- name: 'Configure view networks'
-  ansible.builtin.shell: |
-    set +o pipefail
-    result=1
-    pdnsutil network list | grep {{ dns_server_network_view['cidr'] }}
-    ret=$?
-    if [ $ret -eq 1 ]
-    then
-      pdnsutil {{ dns_server_network_view['cidr'] }} {{ dns_server_network_view['view'] }}
-      result=2
-    else
-      result=0
-    fi
-    exit $result
-  args:
-    executable: '/bin/bash'
-  register: 'view_network_config'
+- name: 'Create network views'
+  ansible.builtin.include_tasks: 'create_network_views.yml'
   loop: "{{ dns_server_network_views }}"
   loop_control:
-    loop_var: 'dns_server_network_view'
-  changed_when: view_network_config['rc'] == 2
-  failed_when: view_network_config['rc'] == 1
+    loop_var: 'network'
 
-- name: 'Configure zone views'
-  ansible.builtin.shell: |
-    set +o pipefail
-    result=1
-    pdnsutil view list {{ dns_server_zone_view['view'] }} | grep {{ dns_server_zone_view['zone'] }}
-    ret=$?
-    if [ $ret -eq 1 ]
-    then
-      pdnsutil view add-zone {{ dns_server_zone_view['view'] }} {{ dns_server_zone_view['zone'] }}..{{ dns_server_zone_view['view'] }}
-      result=2
-    else
-      result=0
-    fi
-    exit $result
-  args:
-    executable: '/bin/bash'
-  register: 'view_zone_config'
+- name: 'Create zone views'
+  ansible.builtin.include_tasks: 'create_zone_views.yml'
   loop: "{{ dns_server_zone_views }}"
   loop_control:
-    loop_var: 'dns_server_zone_view'
-  changed_when: view_zone_config['rc'] == 2
-  failed_when: view_zone_config['rc'] == 1
+    loop_var: 'zone_view'
 
-- name: 'Import TSIG keys'
-  ansible.builtin.shell: |
-    set +o pipefail
-    result=1
-    pdnsutil list-tsig-keys | grep '{{ dns_server_tsig_key_name }}. {{ dns_server_tsig_key_algo }}. {{ dns_server_tsig_key_value }}'
-    ret=$?
-    if [ $ret -eq 1 ]
-    then
-      pdnsutil import-tsig-key {{ dns_server_tsig_key_name }} {{ dns_server_tsig_key_algo }} '{{ dns_server_tsig_key_value }}'
-      result=2
-    else
-      result=0
-    fi
-    exit $result
-  args:
-    executable: '/bin/bash'
-  register: 'tsig_key_import'
-  changed_when: tsig_key_import['rc'] == 2
-  failed_when: tsig_key_import['rc'] == 1
+- name: 'Create TSIG key'
+  ansible.builtin.include_tasks: 'create_tsig_key.yml'
   when:
     - dns_server_tsig_key_name | length > 0
     - dns_server_tsig_key_value | length > 0

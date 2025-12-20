@@ -1,0 +1,27 @@
+---
+- name: 'Check TSIG key'
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/tsigkeys/{{ dns_server_tsig_key_name }}"
+    method: 'GET'
+    headers:
+      X-API-Key: "{{ dns_server_api_key }}"
+    status_code:
+      - 200
+      - 404
+      - 422
+  register: 'tsig_key_api_status'
+
+- name: 'Ensure TSIG key'
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/tsigkeys"
+    method: 'POST'
+    body:
+      name: "{{ dns_server_tsig_key_name }}"
+      algorithm: "{{ dns_server_tsig_key_algo }}"
+      key: "{{ dns_server_tsig_key_value }}"
+    body_format: 'json'
+    headers:
+      X-API-Key: "{{ dns_server_api_key }}"
+    status_code: 201
+  changed_when: true
+  when: tsig_key_api_status['status'] != 200

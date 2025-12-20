@@ -1,0 +1,26 @@
+---
+- name: 'Check network'
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/networks/{{ network['cidr'] }}"
+    method: 'GET'
+    headers:
+      X-API-Key: "{{ dns_server_api_key }}"
+    status_code:
+      - 200
+      - 404
+      - 422
+  register: 'network_api_status'
+
+- name: 'Ensure network'
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/networks/{{ network['cidr'] }}"
+    method: 'PUT'
+    body:
+      view: "{{ network['view'] }}"
+    body_format: 'json'
+    headers:
+      X-API-Key: "{{ dns_server_api_key }}"
+    status_code: 204
+  changed_when: true
+  when:
+    - network_api_status['status'] != 200

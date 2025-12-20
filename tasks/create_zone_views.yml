@@ -1,0 +1,27 @@
+---
+- name: 'Check zone views'
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/views/{{ zone_view['view'] }}"
+    method: 'GET'
+    headers:
+      X-API-Key: "{{ dns_server_api_key }}"
+    status_code:
+      - 200
+      - 404
+      - 422
+  register: 'view_api_status'
+
+- name: 'Ensure zone view'
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/views/{{ zone_view['view'] }}"
+    method: 'POST'
+    body:
+      name: "{{ zone_view['zone'] }}..{{ zone_view['view'] }}"
+    body_format: 'json'
+    headers:
+      X-API-Key: "{{ dns_server_api_key }}"
+    status_code: 204
+  changed_when: true
+  when: >
+    view_api_status['status'] != 200 or
+    (zone_view['zone'] + '..' + zone_view['view']) not in view_api_status['json']['zones']
