@@ -31,15 +31,42 @@
         status_code: 201
       changed_when: true
 
-    - name: 'Render default empty zone'
-      ansible.builtin.template:
-        src: 'default_zone.j2'
-        dest: "/tmp/{{ zone }}.txt"
-        mode: 0600
+    - name: 'Ensure primary zone settings'
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/zones/{{ zone }}"
+        method: 'PUT'
+        body:
+          dnssec: true
+        body_format: 'json'
+        headers:
+          X-API-Key: "{{ dns_server_api_key }}"
+        status_code: 204
+      changed_when: true
 
-    - name: 'Import default empty zone'
-      ansible.builtin.command: |
-        pdnsutil load-zone {{ zone }} /tmp/{{ zone }}.txt
+    - name: 'Ensure primary zone default content'
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/zones/{{ zone }}"
+        method: 'PATCH'
+        body:
+          rrsets:
+            - name: "{{ zone }}."
+              type: "SOA"
+              ttl: "{{ dns_server_default_ttl }}"
+              changetype: "REPLACE"
+              records:
+                - content: "{{ dns_server_ns_name }}. hostmaster.{{ zone }}. 2020010101 600 600 604800 600"
+                  disabled: false
+            - name: "{{ zone }}."
+              type: "NS"
+              ttl: "{{ dns_server_default_ttl }}"
+              changetype: "REPLACE"
+              records:
+                - content: "{{ dns_server_ns_name }}."
+                  disabled: false
+        body_format: 'json'
+        headers:
+          X-API-Key: "{{ dns_server_api_key }}"
+        status_code: 204
       changed_when: true
 
 - name: 'Ensure secondary zone'
@@ -59,51 +86,29 @@
     - zone_api_status['status'] != 200
     - dns_server_role == 'secondary'
 
-- name: "Activate DNSUPDATE TSIG keys for {{ zone }}"
-  ansible.builtin.shell: |
-    set -o pipefail
-    result=1
-    pdnsutil get-meta {{ zone }} TSIG-ALLOW-DNSUPDATE | grep {{ dns_server_tsig_key_name }}
-    ret=$?
-    if [ $ret -eq 1 ]
-    then
-      pdnsutil activate-tsig-key {{ zone }} {{ dns_server_tsig_key_name }} {{ dns_server_role }}
-      pdnsutil set-meta {{ zone }} TSIG-ALLOW-DNSUPDATE {{ dns_server_tsig_key_name }}
-      result=2
-    else
-      result=0
-    fi
-    exit $result
-  args:
-    executable: '/bin/bash'
-  register: 'tsig_key_activate'
-  changed_when: tsig_key_activate['rc'] == 2
-  failed_when: tsig_key_activate['rc'] == 1
+- name: 'Activate TSIG key'
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ dns_server_api_port }}/api/v1/servers/localhost/zones/{{ zone }}/metadata/{{ zone_metadata['type'] }}"
+    method: 'PUT'
+    body:
+      kind: "{{ zone_metadata['type'] }}"
+      metadata:
+        - "{{ dns_server_tsig_key_name }}"
+    body_format: 'json'
+    headers:
+      X-API-Key: "{{ dns_server_api_key }}"
+    status_code: 200
+  changed_when: true
+  loop:
+    - type: 'TSIG-ALLOW-AXFR'
+      when: true
+    - type: 'TSIG-ALLOW-DNSUPDATE'
+      when: "{{ dns_server_role == 'primary' }}"
+    - type: 'AXFR-MASTER-TSIG'
+      when: "{{ dns_server_role == 'secondary' }}"
+  loop_control:
+    loop_var: 'zone_metadata'
   when:
-    - dns_server_role == 'primary'
-    - dns_server_tsig_key_name | length > 0
-    - dns_server_tsig_key_value | length > 0
-
-- name: "Activate TSIG keys for {{ zone }}"
-  ansible.builtin.shell: |
-    set -o pipefail
-    result=1
-    pdnsutil get-meta {{ zone }} AXFR-MASTER-TSIG | grep {{ dns_server_tsig_key_name }}
-    ret=$?
-    if [ $ret -eq 1 ]
-    then
-      pdnsutil activate-tsig-key {{ zone }} {{ dns_server_tsig_key_name }} {{ dns_server_role }}
-      result=2
-    else
-      result=0
-    fi
-    exit $result
-  args:
-    executable: '/bin/bash'
-  register: 'tsig_key_activate'
-  changed_when: tsig_key_activate['rc'] == 2
-  failed_when: tsig_key_activate['rc'] == 1
-  when:
-    - dns_server_role == 'secondary'
+    - zone_metadata['when']
     - dns_server_tsig_key_name | length > 0
     - dns_server_tsig_key_value | length > 0

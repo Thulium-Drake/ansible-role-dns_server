@@ -19,8 +19,8 @@
         port: 53
         ttl: '60'
         zone: 'sub.example.com'
-        record: 'sub.example.com'
-        value: 'some-host.sub.example.com'
+        record: 'sub.example.com.'
+        value: 'some-host.sub.example.com.'
         type: 'NS'
         key_algorithm: "{{ dns_server_tsig_key_algo }}"
         key_name: "{{ dns_server_tsig_key_name }}"
