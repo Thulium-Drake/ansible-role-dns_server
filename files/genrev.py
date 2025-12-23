@@ -155,13 +155,19 @@ if not ns_record_found:
     }
     arpa_zone_contents.append(default_ns_record)
 
-new_zone_content_data = {
-  "rrsets": arpa_zone_contents
-}
-
 api_auth_header = {
   'X-API-KEY': config['pdns']['api-key'],
   'Content-Type': 'application/json'
   }
-new_zone_content_url = zones_url + '/arpa.'
-new_zone_content_r = requests.patch(new_zone_content_url, headers=api_auth_header, data=json.dumps(new_zone_content_data))
+
+arpa_zone_data = {
+  "name": "arpa.",
+  "kind": "master"
+}
+arpa_zone_r = requests.post(zones_url, headers=api_auth_header, data=json.dumps(arpa_zone_data))
+
+arpa_zone_content_data = {
+  "rrsets": arpa_zone_contents
+}
+arpa_zone_content_url = zones_url + '/arpa.'
+arpa_zone_content_r = requests.patch(arpa_zone_content_url, headers=api_auth_header, data=json.dumps(arpa_zone_content_data))
