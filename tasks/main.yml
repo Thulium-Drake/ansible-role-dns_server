@@ -20,7 +20,7 @@
   ansible.builtin.package:
     name:
       - "{{ dns_server_pdns_auth_pkg }}"
-      - "pdns-backend[dns_server_backend] }}"
+      - "{{ pdns-backend[dns_server_backend] }}"
       - "{{ dns_server_python_dns_pkg }}"
       - "{{ dns_server_python_requests_pkg }}"
       - "{{ dns_server_nsupdate_pkg }}"
