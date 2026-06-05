@@ -11,5 +11,5 @@ dns_server_selinux_tools_pkg: 'policycoreutils-python-utils'
 pdns_backend:
   - lmdb: 'pdns-backend-lmdb'
   - mysql: 'pdns-backend-mysql'
-  - sqlite3: 'pdns-backend-sqlite'
+  - sqlite: 'pdns-backend-sqlite'
 
