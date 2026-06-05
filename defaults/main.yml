@@ -1,6 +1,6 @@
 ---
 # Which backend to use to store zone data
-dns_server_backend: 'sqlite3'
+dns_server_backend: 'sqlite'
 
 # DNS views
 # For all documentation regarding views, please see https://doc.powerdns.com/authoritative/views.html

@@ -7,3 +7,8 @@ dns_server_python_requests_pkg: 'python39-requests'
 dns_server_sqlite_pkg: 'sqlite'
 dns_server_sqlite_schema: "/usr/share/doc/pdns-backend-sqlite/schema.sqlite3.sql"
 dns_server_selinux_tools_pkg: 'python3-policycoreutils'
+
+pdns_backend:
+  - lmdb: 'pdns-backend-lmdb'
+  - mysql: 'pdns-backend-mysql'
+  - sqlite: 'pdns-backend-sqlite'

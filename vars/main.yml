@@ -2,7 +2,7 @@
 dns_server_supported_backends:
   - 'lmdb'
   - 'mysql'
-  - 'sqlite3'
+  - 'sqlite'
 
 dns_server_supported_backend_views:
   - 'lmdb'
