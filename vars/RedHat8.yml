@@ -12,4 +12,3 @@ pdns_backend:
   - lmdb: 'pdns-backend-lmdb'
   - mysql: 'pdns-backend-mysql'
   - sqlite: 'pdns-backend-sqlite'
-
