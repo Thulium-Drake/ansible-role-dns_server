@@ -104,8 +104,6 @@
       when: true
     - type: 'TSIG-ALLOW-DNSUPDATE'
       when: "{{ dns_server_role == 'primary' }}"
-    - type: 'AXFR-MASTER-TSIG'
-      when: "{{ dns_server_role == 'secondary' }}"
   loop_control:
     loop_var: 'zone_metadata'
   when:
