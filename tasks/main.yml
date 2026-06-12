@@ -177,12 +177,14 @@
 - name: 'Create network views'
   ansible.builtin.include_tasks: 'create_network_views.yml'
   loop: "{{ dns_server_network_views }}"
+  when: dns_server_views | bool
   loop_control:
     loop_var: 'network'
 
 - name: 'Create zone views'
   ansible.builtin.include_tasks: 'create_zone_views.yml'
   loop: "{{ dns_server_zone_views }}"
+  when: dns_server_views | bool
   loop_control:
     loop_var: 'zone_view'
 
