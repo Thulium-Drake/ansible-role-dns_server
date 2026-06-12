@@ -9,6 +9,6 @@ dns_server_sqlite_schema: '/usr/share/doc/pdns-backend-sqlite/schema.sqlite3.sql
 dns_server_selinux_tools_pkg: 'policycoreutils-python-utils'
 
 pdns_backend:
-  - lmdb: 'pdns-backend-lmdb'
-  - mysql: 'pdns-backend-mysql'
-  - sqlite: 'pdns-backend-sqlite'
+  lmdb: 'pdns-backend-lmdb'
+  mysql: 'pdns-backend-mysql'
+  sqlite: 'pdns-backend-sqlite'
